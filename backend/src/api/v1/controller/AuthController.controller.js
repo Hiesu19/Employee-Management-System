@@ -1,5 +1,5 @@
 const authService = require('../services/auth.service');
-const { successResponse, errorResponse } = require('../utils/respone.utils');
+const { successResponse, errorResponse } = require('../utils/response.utils');
 const { v4: uuidv4 } = require('uuid');
 
 class AuthController {
