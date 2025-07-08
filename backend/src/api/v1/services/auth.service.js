@@ -3,6 +3,7 @@ const User = require('../models/User.model');
 const createUser = async (user) => {
     try {
         const newUser = await User.create(user);
+
         const newUserResponse = {
             userID: newUser.userID,
             userName: newUser.userName,
@@ -14,6 +15,7 @@ const createUser = async (user) => {
     } catch (error) {
         throw error;
     }
+
 }
 
 module.exports = { createUser };
