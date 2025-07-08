@@ -1,12 +1,14 @@
 const authService = require('../services/auth.service');
+const { successResponse, errorResponse } = require('../utils/respone.utils');
 const { v4: uuidv4 } = require('uuid');
 
 class AuthController {
     async login(req, res) {
-        res.status(200).json({
-            success: true,
-            message: 'Login successfully',
-        });
+        try {
+            successResponse(res, "Login successfully");
+        } catch (error) {
+            errorResponse(res, error);
+        }
     }
 
     async register(req, res) {
@@ -22,17 +24,9 @@ class AuthController {
             }
 
             const user = await authService.createUser(newUser);
-            res.status(201).json({
-                success: true,
-                message: 'User created successfully',
-                data: user,
-            });
+            successResponse(res, user, "User created successfully");
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Internal server error',
-                error: error.message,
-            });
+            errorResponse(res, error);
         }
 
     }
