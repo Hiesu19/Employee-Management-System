@@ -12,3 +12,15 @@ exports.generateAccessToken = (user) => {
     );
 }
 
+exports.generateRefreshToken = (user) => {
+    return jwt.sign(
+        {
+            id: user.userID,
+            role: user.role,
+            email: user.email,
+        },
+        process.env.JWT_REFRESH_KEY,
+        { expiresIn: "7d" }
+    );
+}
+

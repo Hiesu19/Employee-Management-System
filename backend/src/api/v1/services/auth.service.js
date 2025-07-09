@@ -2,7 +2,8 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
 const User = require('../models/User.model');
-const { generateAccessToken } = require('../utils/jwt-token.utils');
+const RefreshToken = require('../models/RefreshToken.model');
+const { generateAccessToken, generateRefreshToken } = require('../utils/jwt-token.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 
 const createUser = async (user) => {
@@ -49,7 +50,9 @@ const login = async (email, password) => {
         throw new ResponseError(400, "Invalid password");
     }
 
-    const token = generateAccessToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
     const userResponse = {
         userID: user.userID,
         fullName: user.fullName,
@@ -60,8 +63,42 @@ const login = async (email, password) => {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
     }
-    return { userResponse, token };
+
+    await saveRefreshToken(user.userID, refreshToken);
+    return { userResponse, accessToken, refreshToken };
 
 }
 
-module.exports = { createUser, login };
+const saveRefreshToken = async (userID, refreshToken) => {
+    try {
+        const newRefreshToken = {
+            userID,
+            refreshToken,
+        }
+        await RefreshToken.create(newRefreshToken);
+    } catch (error) {
+        throw error;
+    }
+}
+
+const refreshTokenHandler = async (refreshToken) => {
+    try {
+        const res = await RefreshToken.findOne({ where: { refreshToken } });
+        if (!res) {
+            throw new ResponseError(400, "Invalid refresh token");
+        }
+
+        const user = await User.findOne({ where: { userID: res.userID } });
+        if (!user) {
+            throw new ResponseError(400, "User not found");
+        }
+
+        const accessToken = generateAccessToken(user);
+        return accessToken;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+module.exports = { createUser, login, saveRefreshToken, refreshTokenHandler };

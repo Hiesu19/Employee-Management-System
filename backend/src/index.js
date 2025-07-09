@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const db = require("./config/db.config");
 const route = require("./api/v1/routes/index.route");
@@ -13,6 +14,7 @@ db.sequelize.sync();
 // app config
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 route(app);
 
