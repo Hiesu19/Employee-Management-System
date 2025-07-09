@@ -101,4 +101,17 @@ const refreshTokenHandler = async (refreshToken) => {
     }
 }
 
-module.exports = { createUser, login, saveRefreshToken, refreshTokenHandler };
+const logout = async (refreshToken) => {
+    try {
+        const res = await RefreshToken.findOne({ where: { refreshToken } });
+        if (!res) {
+            throw new ResponseError(400, "Invalid refresh token");
+        }
+        await RefreshToken.destroy({ where: { userID: res.userID } });
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+module.exports = { createUser, login, saveRefreshToken, refreshTokenHandler, logout };
