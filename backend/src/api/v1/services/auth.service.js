@@ -6,6 +6,8 @@ const RefreshToken = require('../models/RefreshToken.model');
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt-token.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 
+// Tạo user
+// Khi tạo xong trả về dữ liệu không có password
 const createUser = async (user) => {
     try {
         const salt = await bcrypt.genSalt(10);
@@ -39,6 +41,7 @@ const createUser = async (user) => {
 
 }
 
+// Đăng nhập
 const login = async (email, password) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -69,6 +72,7 @@ const login = async (email, password) => {
 
 }
 
+// Lưu refresh token vao database
 const saveRefreshToken = async (userID, refreshToken) => {
     try {
         const newRefreshToken = {
@@ -80,6 +84,8 @@ const saveRefreshToken = async (userID, refreshToken) => {
         throw error;
     }
 }
+
+// Xử lý refresh token
 
 const refreshTokenHandler = async (refreshToken) => {
     try {
@@ -101,6 +107,9 @@ const refreshTokenHandler = async (refreshToken) => {
     }
 }
 
+// Đăng xuất
+// Xóa toàn bộ refresh token của user đó trong database, xóa cookie refresh token
+// -> Đăng xuất trên toàn bộ thiết bị
 const logout = async (refreshToken) => {
     try {
         const res = await RefreshToken.findOne({ where: { refreshToken } });

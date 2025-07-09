@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+// Tạo access token
 exports.generateAccessToken = (user) => {
     return jwt.sign(
         {
@@ -12,6 +13,7 @@ exports.generateAccessToken = (user) => {
     );
 }
 
+// Tạo refresh token
 exports.generateRefreshToken = (user) => {
     return jwt.sign(
         {

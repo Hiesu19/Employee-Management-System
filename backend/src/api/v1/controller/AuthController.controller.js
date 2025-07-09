@@ -4,6 +4,7 @@ const { successResponse, errorResponse } = require('../utils/response.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 
 class AuthController {
+    // Đăng nhập
     async login(req, res, next) {
         try {
             const { email, password } = req.body;
@@ -22,6 +23,7 @@ class AuthController {
         }
     }
 
+    // Tạo user
     async register(req, res, next) {
         try {
             const { fullName, email, phone, password, avatarURL } = req.body;
@@ -40,6 +42,7 @@ class AuthController {
         }
     }
 
+    // Xử lý refresh token
     async refreshToken(req, res, next) {
         try {
             const cookie = req.cookies;
@@ -57,6 +60,7 @@ class AuthController {
         }
     }
 
+    // Đăng xuất
     async logout(req, res, next) {
         try {
             const cookie = req.cookies;

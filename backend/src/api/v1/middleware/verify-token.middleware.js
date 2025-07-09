@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { ResponseError } = require("../error/ResponseError.error");
 
+// Verify access token
 const verifyToken = (req, res, next) => {
     try {
         const token = req.headers.authorization;
@@ -36,6 +37,7 @@ const verifyToken = (req, res, next) => {
     }
 }
 
+// Verify access token và kiểm tra role
 const verifyTokenAndCheckRole = (roles) => {
     return (req, res, next) => {
         verifyToken(req, res, (err) => {
