@@ -1,3 +1,4 @@
+// Cấu trúc gửi về client thành công
 exports.successResponse = (res, data, message = "OK") => {
     return res.status(200).json({
         success: "success",
@@ -6,6 +7,7 @@ exports.successResponse = (res, data, message = "OK") => {
     })
 }
 
+// Cấu trúc gửi về client lỗi
 exports.errorResponse = (res, error, statusCode = 400) => {
     const finalStatusCode = error.status || statusCode;
 

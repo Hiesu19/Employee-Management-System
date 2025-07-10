@@ -2,9 +2,12 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
 const User = require('../models/User.model');
-const { generateAccessToken } = require('../utils/jwt-token.utils');
+const RefreshToken = require('../models/RefreshToken.model');
+const { generateAccessToken, generateRefreshToken } = require('../utils/jwt-token.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 
+// Tạo user
+// Khi tạo xong trả về dữ liệu không có password
 const createUser = async (user) => {
     try {
         const salt = await bcrypt.genSalt(10);
@@ -38,6 +41,7 @@ const createUser = async (user) => {
 
 }
 
+// Đăng nhập
 const login = async (email, password) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -49,7 +53,9 @@ const login = async (email, password) => {
         throw new ResponseError(400, "Invalid password");
     }
 
-    const token = generateAccessToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
     const userResponse = {
         userID: user.userID,
         fullName: user.fullName,
@@ -60,8 +66,61 @@ const login = async (email, password) => {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
     }
-    return { userResponse, token };
+
+    await saveRefreshToken(user.userID, refreshToken);
+    return { userResponse, accessToken, refreshToken };
 
 }
 
-module.exports = { createUser, login };
+// Lưu refresh token vao database
+const saveRefreshToken = async (userID, refreshToken) => {
+    try {
+        const newRefreshToken = {
+            userID,
+            refreshToken,
+        }
+        await RefreshToken.create(newRefreshToken);
+    } catch (error) {
+        throw error;
+    }
+}
+
+// Xử lý refresh token
+
+const refreshTokenHandler = async (refreshToken) => {
+    try {
+        const res = await RefreshToken.findOne({ where: { refreshToken } });
+        if (!res) {
+            throw new ResponseError(400, "Invalid refresh token");
+        }
+
+        const user = await User.findOne({ where: { userID: res.userID } });
+        if (!user) {
+            throw new ResponseError(400, "User not found");
+        }
+
+        const accessToken = generateAccessToken(user);
+        return accessToken;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+// Đăng xuất
+// Xóa toàn bộ refresh token của user đó trong database, xóa cookie refresh token
+// -> Đăng xuất trên toàn bộ thiết bị
+const logout = async (refreshToken) => {
+    try {
+        const res = await RefreshToken.findOne({ where: { refreshToken } });
+        if (!res) {
+            throw new ResponseError(400, "Invalid refresh token");
+        }
+        await RefreshToken.destroy({ where: { userID: res.userID } });
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+module.exports = { createUser, login, saveRefreshToken, refreshTokenHandler, logout };
