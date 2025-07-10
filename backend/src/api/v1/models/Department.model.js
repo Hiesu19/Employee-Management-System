@@ -12,6 +12,10 @@ const Department = sequelize.define('Department', {
         allowNull: false,
         unique: true,
     },
+    description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
 }, {
     tableName: 'departments',
     timestamps: true,

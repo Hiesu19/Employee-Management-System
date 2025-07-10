@@ -6,5 +6,5 @@ const { verifyToken, verifyTokenAndCheckRole } = require('../middleware/verify-t
 
 
 router.post('/add-department', verifyTokenAndCheckRole(['root']), DepartmentController.createDepartment);
-
+router.get('/', verifyTokenAndCheckRole(['root']), DepartmentController.getDepartments);
 module.exports = router;
