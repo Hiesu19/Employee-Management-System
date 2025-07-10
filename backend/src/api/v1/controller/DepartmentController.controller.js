@@ -26,6 +26,27 @@ class DepartmentController {
             next(error);
         }
     }
+
+    async updateDepartmentInfo(req, res, next) {
+        try {
+            const { departmentID } = req.params;
+            const { departmentName, description } = req.body;
+            const department = await departmentService.updateDepartmentInfo(departmentID, departmentName, description);
+            successResponse(res, department, "Update department successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteDepartment(req, res, next) {
+        try {
+            const { departmentID } = req.params;
+            const department = await departmentService.deleteDepartment(departmentID);
+            successResponse(res, department, "Delete department successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new DepartmentController();

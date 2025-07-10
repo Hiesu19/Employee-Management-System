@@ -39,4 +39,24 @@ const getDepartments = async (page, limit) => {
     return departmentsWithUserCount;
 }
 
-module.exports = { createDepartment, getDepartments };
+const updateDepartmentInfo = async (departmentID, departmentName, description) => {
+    const departmentFound = await Department.findOne({ where: { departmentID } });
+    if (!departmentFound) {
+        throw new ResponseError(404, "Department not found");
+    }
+    departmentFound.departmentName = departmentName || departmentFound.departmentName;
+    departmentFound.description = description || departmentFound.description;
+    await departmentFound.save();
+    return departmentFound;
+}
+
+const deleteDepartment = async (departmentID) => {
+    const departmentFound = await Department.findOne({ where: { departmentID } });
+    if (!departmentFound) {
+        throw new ResponseError(404, "Department not found");
+    }
+    await departmentFound.destroy();
+    return departmentFound;
+}
+
+module.exports = { createDepartment, getDepartments, updateDepartmentInfo, deleteDepartment };
