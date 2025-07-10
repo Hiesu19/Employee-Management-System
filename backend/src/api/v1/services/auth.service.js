@@ -1,8 +1,7 @@
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
-const User = require('../models/User.model');
-const RefreshToken = require('../models/RefreshToken.model');
+const { User, RefreshToken } = require('../models/index.model');
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt-token.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 
