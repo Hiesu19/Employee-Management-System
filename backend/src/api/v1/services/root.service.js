@@ -1,4 +1,4 @@
-const { User } = require('../models/index.model');
+const { User, Department } = require('../models/index.model');
 const { ResponseError } = require('../error/ResponseError.error');
 const { Op } = require('sequelize');
 
@@ -93,12 +93,36 @@ const deleteEmployee = async (employeeID) => {
     await employeeFound.destroy();
 }
 
+const changeDepartment = async (employeeID, departmentID) => {
+    const employeeFound = await User.findOne({ where: { userID: employeeID } });
+    if (!employeeFound) {
+        throw new ResponseError(404, "Employee not found");
+    }
+
+    const departmentFound = await Department.findOne({ where: { departmentID: departmentID } });
+    if (!departmentFound) {
+        throw new ResponseError(404, "Department not found");
+    }
+
+    employeeFound.departmentID = departmentID;
+    const updatedEmployee = await employeeFound.save();
+    return {
+        userID: updatedEmployee.userID,
+        fullName: updatedEmployee.fullName,
+        email: updatedEmployee.email,
+        phone: updatedEmployee.phone,
+        departmentID: updatedEmployee.departmentID,
+        departmentName: departmentFound.departmentName,
+    };
+}
+
 module.exports = {
     updateEmployeeInfo,
     deleteEmployee,
     getEmployeeInfo,
     getAllEmployeeInfo,
     searchEmployeeByEmailOrName,
-    deleteEmployee
+    deleteEmployee,
+    changeDepartment
 
 };

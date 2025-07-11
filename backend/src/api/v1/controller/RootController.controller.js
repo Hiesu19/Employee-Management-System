@@ -65,6 +65,16 @@ class RootController {
             next(error);
         }
     }
+
+    async changeDepartment(req, res, next) {
+        try {
+            const { employeeID, departmentID } = req.body;
+            const result = await rootService.changeDepartment(employeeID, departmentID);
+            successResponse(res, result, "Change department successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new RootController();
