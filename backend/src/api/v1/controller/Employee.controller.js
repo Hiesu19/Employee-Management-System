@@ -66,6 +66,16 @@ class EmployeeController {
             next(error);
         }
     }
+    async getMyCheckInOut(req, res, next) {
+        try {
+            const userID = req.user.id;
+            const { offset, limit, dateStart, dateEnd } = req.query;
+            const checkInOut = await employeeService.getMyCheckInOut(userID, offset, limit, dateStart, dateEnd);
+            successResponse(res, checkInOut, "Get my check in out successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new EmployeeController();  
