@@ -1,5 +1,6 @@
-const { User, Department } = require('../models/index.model');
+const { User, Department, CheckInOut } = require('../models/index.model');
 const { ResponseError } = require('../error/ResponseError.error');
+const { v4: uuidv4 } = require('uuid');
 
 const getMyInfo = async (userID) => {
     const employee = await User.findOne({
@@ -40,7 +41,50 @@ const updateMyInfo = async (userID, fullName, phone) => {
     return getMyInfo(userID);
 }
 
+const checkIn = async (user) => {
+    const checkInToday = await CheckInOut.findOne({
+        where: {
+            userID: user.id,
+            date: new Date(),
+        },
+    });
+    if (checkInToday) {
+        throw new ResponseError(400, "You have already checked in today");
+    }
+
+    const checkIn = await CheckInOut.create({
+        checkID: uuidv4(),
+        userID: user.id,
+        userEmail: user.email,
+        checkInTime: new Date().toTimeString().slice(0, 8),
+        checkOutTime: null,
+        date: new Date(),
+    });
+    return checkIn;
+}
+
+const checkOut = async (user) => {
+    const checkInToday = await CheckInOut.findOne({
+        where: {
+            userID: user.id,
+            date: new Date(),
+        },
+    });
+    if (checkInToday) {
+        if (checkInToday.checkOutTime) {
+            throw new ResponseError(400, "You have already checked out today");
+        }
+        checkInToday.checkOutTime = new Date().toTimeString().slice(0, 8);
+        await checkInToday.save();
+        return checkInToday;
+    } else {
+        throw new ResponseError(400, "You haven't checked in today");
+    }
+}
+
 module.exports = {
     getMyInfo,
-    updateMyInfo
+    updateMyInfo,
+    checkIn,
+    checkOut
 }
