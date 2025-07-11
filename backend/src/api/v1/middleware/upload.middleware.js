@@ -1,5 +1,6 @@
 const multer = require('multer');
 const path = require('path');
+const { ResponseError } = require('../error/ResponseError.error');
 
 const storage = multer.memoryStorage();
 
