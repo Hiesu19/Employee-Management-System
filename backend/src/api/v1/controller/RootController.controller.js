@@ -1,7 +1,7 @@
 const rootService = require('../services/root.service');
+const resetPasswordService = require('../services/reset-password.service');
 
 const { successResponse, errorResponse } = require('../utils/response.utils');
-const { ResponseError } = require('../error/ResponseError.error');
 
 class RootController {
     async getEmployeeInfo(req, res, next) {
@@ -51,6 +51,16 @@ class RootController {
             const { employeeID } = req.params;
             await rootService.deleteEmployee(employeeID);
             successResponse(res, { "message": "Delete employee successfully" }, "Delete employee successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async resetPassword(req, res, next) {
+        try {
+            const { employeeIDArray } = req.body;
+            const result = await resetPasswordService.resetPassword(employeeIDArray);
+            successResponse(res, result, "Reset password successfully");
         } catch (error) {
             next(error);
         }

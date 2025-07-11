@@ -93,4 +93,12 @@ const deleteEmployee = async (employeeID) => {
     await employeeFound.destroy();
 }
 
-module.exports = { updateEmployeeInfo, deleteEmployee, getEmployeeInfo, getAllEmployeeInfo, searchEmployeeByEmailOrName };
+module.exports = {
+    updateEmployeeInfo,
+    deleteEmployee,
+    getEmployeeInfo,
+    getAllEmployeeInfo,
+    searchEmployeeByEmailOrName,
+    deleteEmployee
+
+};
