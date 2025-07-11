@@ -36,6 +36,46 @@ class EmployeeController {
             next(error);
         }
     }
+
+    async checkIn(req, res, next) {
+        try {
+            const role = req.user.role;
+            if (role === 'root') {
+                errorResponse(res, "You are root, you can't check in", 403);
+                return;
+            }
+
+            const checkIn = await employeeService.checkIn(req.user);
+            successResponse(res, checkIn, "Check in successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async checkOut(req, res, next) {
+        try {
+            const role = req.user.role;
+            if (role === 'root') {
+                errorResponse(res, "You are root, you can't check out", 403);
+                return;
+            }
+
+            const checkOut = await employeeService.checkOut(req.user);
+            successResponse(res, checkOut, "Check out successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+    async getMyCheckInOut(req, res, next) {
+        try {
+            const userID = req.user.id;
+            const { offset, limit, dateStart, dateEnd } = req.query;
+            const checkInOut = await employeeService.getMyCheckInOut(userID, offset, limit, dateStart, dateEnd);
+            successResponse(res, checkInOut, "Get my check in out successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new EmployeeController();  

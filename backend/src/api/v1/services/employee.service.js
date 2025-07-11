@@ -1,5 +1,7 @@
-const { User, Department } = require('../models/index.model');
+const { User, Department, CheckInOut } = require('../models/index.model');
 const { ResponseError } = require('../error/ResponseError.error');
+const { v4: uuidv4 } = require('uuid');
+const { Op } = require('sequelize');
 
 const getMyInfo = async (userID) => {
     const employee = await User.findOne({
@@ -40,7 +42,92 @@ const updateMyInfo = async (userID, fullName, phone) => {
     return getMyInfo(userID);
 }
 
+const checkIn = async (user) => {
+    const checkInToday = await CheckInOut.findOne({
+        where: {
+            userID: user.id,
+            date: new Date(),
+        },
+    });
+    if (checkInToday) {
+        throw new ResponseError(400, "You have already checked in today");
+    }
+
+    const checkIn = await CheckInOut.create({
+        checkID: uuidv4(),
+        userID: user.id,
+        userEmail: user.email,
+        checkInTime: new Date().toTimeString().slice(0, 8),
+        checkOutTime: null,
+        date: new Date(),
+    });
+    return checkIn;
+}
+
+const checkOut = async (user) => {
+    const checkInToday = await CheckInOut.findOne({
+        where: {
+            userID: user.id,
+            date: new Date(),
+        },
+    });
+    if (checkInToday) {
+        if (checkInToday.checkOutTime) {
+            throw new ResponseError(400, "You have already checked out today");
+        }
+        checkInToday.checkOutTime = new Date().toTimeString().slice(0, 8);
+        await checkInToday.save();
+        return checkInToday;
+    } else {
+        throw new ResponseError(400, "You haven't checked in today");
+    }
+}
+
+const getMyCheckInOut = async (userID, offset, limit, dateStart, dateEnd) => {
+    if (!dateStart || dateStart === null) {
+        dateStart = new Date(1970, 1, 1);
+    }
+    if (!dateEnd || dateEnd === null) {
+        dateEnd = new Date(9999, 12, 31);
+    }
+    if (!offset || offset === null) {
+        offset = 0;
+    }
+    if (!limit || limit === null) {
+        limit = 10;
+    }
+
+    const checkInOutFound = await CheckInOut.findAll({
+        where: { userID: userID, checkOutTime: { [Op.not]: null }, date: { [Op.between]: [dateStart, dateEnd] } },
+        offset: offset,
+        limit: limit,
+        order: [['date', 'DESC']],
+        attributes: {
+            exclude: ['userID', 'userEmail', 'checkID']
+        }
+    });
+
+    var totalTimeWork = 0;
+    const checkInOut = checkInOutFound.map(record => {
+        const plainRecord = record.toJSON();
+        const checkInTime = new Date(`1970-01-01T${plainRecord.checkInTime}`);
+        const checkOutTime = new Date(`1970-01-01T${plainRecord.checkOutTime}`);
+        const timeWork = (checkOutTime.getTime() - checkInTime.getTime()) / 1000;
+        totalTimeWork += timeWork;
+        return { ...plainRecord, timeWork };
+    });
+
+    return {
+        total: checkInOut.length,
+        totalTimeWork: totalTimeWork,
+        checkInOut
+    };
+};
+
 module.exports = {
     getMyInfo,
-    updateMyInfo
+    updateMyInfo,
+    checkIn,
+    checkOut,
+    getMyCheckInOut
 }
