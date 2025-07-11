@@ -62,6 +62,7 @@ const login = async (email, password) => {
         phone: user.phone,
         avatarURL: user.avatarURL,
         role: user.role,
+        mustChangePassword: user.mustChangePassword,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
     }
