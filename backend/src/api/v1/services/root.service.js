@@ -93,39 +93,60 @@ const deleteEmployee = async (employeeID) => {
     await employeeFound.destroy();
 }
 
-const changeDepartment = async (employeeID, departmentID) => {
-    const employeeFound = await User.findOne({ where: { userID: employeeID } });
-    if (!employeeFound) {
-        throw new ResponseError(404, "Employee not found");
+const changeDepartment = async (employeeID, departmentID, isKick) => {
+    if (isKick === "true") {
+        const employeeFound = await User.findOne({ where: { userID: employeeID } });
+        if (!employeeFound) {
+            throw new ResponseError(404, "Employee not found");
+        }
+        employeeFound.departmentID = null;
+    }
+    else {
+        const employeeFound = await User.findOne({ where: { userID: employeeID } });
+        if (!employeeFound) {
+            throw new ResponseError(404, "Employee not found");
+        }
+
+        const departmentFound = await Department.findOne({ where: { departmentID: departmentID } });
+        if (!departmentFound) {
+            throw new ResponseError(404, "Department not found");
+        }
+
+        employeeFound.departmentID = departmentID;
+        employeeFound.role = "employee"; // Mới vào phòng thì  là nhân viên
+        const updatedEmployee = await employeeFound.save();
+        return {
+            userID: updatedEmployee.userID,
+            fullName: updatedEmployee.fullName,
+            email: updatedEmployee.email,
+            phone: updatedEmployee.phone,
+            departmentID: updatedEmployee.departmentID,
+            role: updatedEmployee.role,
+            departmentName: departmentFound.departmentName,
+        };
     }
 
-    const departmentFound = await Department.findOne({ where: { departmentID: departmentID } });
-    if (!departmentFound) {
-        throw new ResponseError(404, "Department not found");
-    }
 
-    employeeFound.departmentID = departmentID;
-    employeeFound.role = "employee"; // Mới vào phòng thì  là nhân viên
-    const updatedEmployee = await employeeFound.save();
-    return {
-        userID: updatedEmployee.userID,
-        fullName: updatedEmployee.fullName,
-        email: updatedEmployee.email,
-        phone: updatedEmployee.phone,
-        departmentID: updatedEmployee.departmentID,
-        role: updatedEmployee.role,
-        departmentName: departmentFound.departmentName,
-    };
 }
 
 const changeRole = async (employeeID, role) => {
     const employeeFound = await User.findOne({ where: { userID: employeeID } });
+    var departmentName = null;
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
     if (role !== "root" && role !== "manager" && role !== "employee") {
         throw new ResponseError(400, "Role is not valid");
     }
+
+    if (role === "manager") {
+        const departmentFound = await Department.findOne({ where: { departmentID: employeeFound.departmentID } });
+        if (!departmentFound) {
+            throw new ResponseError(404, "To change role to manager, the employee must be in a department");
+        }
+        departmentName = departmentFound.departmentName;
+    }
+    const oldRole = employeeFound.role;
 
     employeeFound.role = role;
     await employeeFound.save();
@@ -134,7 +155,10 @@ const changeRole = async (employeeID, role) => {
         fullName: employeeFound.fullName,
         email: employeeFound.email,
         phone: employeeFound.phone,
+        departmentID: employeeFound.departmentID,
+        departmentName: departmentName,
         role: employeeFound.role,
+        oldRole: oldRole,
     }
     return result;
 }

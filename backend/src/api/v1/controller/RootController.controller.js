@@ -68,8 +68,9 @@ class RootController {
 
     async changeDepartment(req, res, next) {
         try {
+            const { isKick } = req.query;
             const { employeeID, departmentID } = req.body;
-            const result = await rootService.changeDepartment(employeeID, departmentID);
+            const result = await rootService.changeDepartment(employeeID, departmentID, isKick);
             successResponse(res, result, "Change department successfully");
         } catch (error) {
             next(error);
@@ -80,7 +81,7 @@ class RootController {
         try {
             const { employeeID, role } = req.body;
             const result = await rootService.changeRole(employeeID, role);
-            successResponse(res, result, `Change role successfully ${result.fullName}: ${role} -> ${result.role}`);
+            successResponse(res, result, `Change role successfully ${result.fullName}: ${result.oldRole} -> ${result.role}`);
         } catch (error) {
             next(error);
         }
