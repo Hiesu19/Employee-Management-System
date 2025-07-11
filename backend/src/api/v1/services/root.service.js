@@ -105,6 +105,7 @@ const changeDepartment = async (employeeID, departmentID) => {
     }
 
     employeeFound.departmentID = departmentID;
+    employeeFound.role = "employee"; // Mới vào phòng thì  là nhân viên
     const updatedEmployee = await employeeFound.save();
     return {
         userID: updatedEmployee.userID,
@@ -112,8 +113,30 @@ const changeDepartment = async (employeeID, departmentID) => {
         email: updatedEmployee.email,
         phone: updatedEmployee.phone,
         departmentID: updatedEmployee.departmentID,
+        role: updatedEmployee.role,
         departmentName: departmentFound.departmentName,
     };
+}
+
+const changeRole = async (employeeID, role) => {
+    const employeeFound = await User.findOne({ where: { userID: employeeID } });
+    if (!employeeFound) {
+        throw new ResponseError(404, "Employee not found");
+    }
+    if (role !== "root" && role !== "manager" && role !== "employee") {
+        throw new ResponseError(400, "Role is not valid");
+    }
+
+    employeeFound.role = role;
+    await employeeFound.save();
+    const result = {
+        userID: employeeFound.userID,
+        fullName: employeeFound.fullName,
+        email: employeeFound.email,
+        phone: employeeFound.phone,
+        role: employeeFound.role,
+    }
+    return result;
 }
 
 module.exports = {
@@ -123,6 +146,7 @@ module.exports = {
     getAllEmployeeInfo,
     searchEmployeeByEmailOrName,
     deleteEmployee,
-    changeDepartment
+    changeDepartment,
+    changeRole
 
 };

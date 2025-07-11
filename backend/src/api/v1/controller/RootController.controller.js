@@ -75,6 +75,16 @@ class RootController {
             next(error);
         }
     }
+
+    async changeRole(req, res, next) {
+        try {
+            const { employeeID, role } = req.body;
+            const result = await rootService.changeRole(employeeID, role);
+            successResponse(res, result, `Change role successfully ${result.fullName}: ${role} -> ${result.role}`);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new RootController();

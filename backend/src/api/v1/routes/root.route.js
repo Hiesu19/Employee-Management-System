@@ -7,7 +7,7 @@ const { verifyToken, verifyTokenAndCheckRole } = require('../middleware/verify-t
 
 router.put('/employee/reset-password', verifyTokenAndCheckRole(['root']), RootController.resetPassword);
 router.put('/employee/change-department', verifyTokenAndCheckRole(['root']), RootController.changeDepartment);
-
+router.put('/employee/change-role', verifyTokenAndCheckRole(['root']), RootController.changeRole);
 
 router.get('/employee', verifyTokenAndCheckRole(['root']), RootController.getAllEmployeeInfo);
 router.get('/employee/search', verifyTokenAndCheckRole(['root']), RootController.searchEmployeeByEmailOrName);
