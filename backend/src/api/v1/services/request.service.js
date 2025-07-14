@@ -17,6 +17,14 @@ const createRequest = async (user, request) => {
         toDate: request.toDate,
         reason: request.reason,
     });
+
+    // Gui email ()
+    if (user.role === 'employee') {
+        const mailTo = await User.findOne({ where: { role: 'manager' || 'root', departmentID: user.departmentID } });
+    } else {
+        const mailTo = await User.findOne({ where: { role: 'root' } });
+    }
+    ;
     return newRequest;
 }
 
@@ -159,11 +167,81 @@ const getAllRequestByManager = async (managerID, offset, limit, dateStart, dateE
     });
     return requests;
 }
+
+const editStatusRequestByRoot = async (requestID, user, status) => {
+    const request = await Request.findOne({ where: { id: requestID } });
+    if (!request) {
+        throw new ResponseError(404, "Request not found");
+    }
+    if (request.status !== 'pending') {
+        throw new ResponseError(400, "Request is not pending");
+    }
+    request.status = status;
+    request.checkedAt = new Date();
+    request.checkedBy = user.id;
+    request.checkedByEmail = user.email;
+
+    // Gui email
+    const user = await User.findOne({
+        where: { userID: request.userID },
+        attributes: ['email']
+    });
+    const mailTo = user?.email;
+
+
+    await request.save();
+}
+
+const editStatusRequestByManager = async (requestID, manager, status) => {
+    if (status !== 'approved' && status !== 'rejected') {
+        throw new ResponseError(400, "Invalid status");
+    }
+
+    // Kiểm tra request
+    const request = await Request.findOne({ where: { id: requestID } });
+    if (!request) {
+        throw new ResponseError(404, "Request not found");
+    }
+    if (request.status !== 'pending') {
+        throw new ResponseError(400, "Request is not pending");
+    }
+
+    // Kiểm tra user
+    const user = await User.findOne({ where: { userID: request.userID } });
+    if (!user) {
+        throw new ResponseError(404, "User not found");
+    }
+    if (user.role !== 'employee') {
+        throw new ResponseError(400, "User is not an employee");
+    }
+
+    // Kiểm tra manager có cùng department với user không
+    const managerFound = await User.findOne({ where: { userID: manager.id } });
+    if (!managerFound) {
+        throw new ResponseError(404, "Manager not found");
+    }
+    if (managerFound.departmentID !== user.departmentID) {
+        throw new ResponseError(400, "Manager is not in the same department as the user");
+    }
+    request.status = status;
+    request.checkedAt = new Date();
+    request.checkedBy = manager.id;
+    request.checkedByEmail = manager.email;
+
+    // Gui email
+    const mailTo = user.email;
+
+    await request.save();
+}
+
+
 module.exports = {
     createRequest,
     getMyRequest,
     updateMyRequest,
     deleteMyRequest,
     getAllRequestByRoot,
-    getAllRequestByManager
+    getAllRequestByManager,
+    editStatusRequestByRoot,
+    editStatusRequestByManager
 }

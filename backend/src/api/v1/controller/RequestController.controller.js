@@ -63,6 +63,29 @@ class RequestController {
             next(error);
         }
     }
+
+    async editStatusRequestByRoot(req, res, next) {
+        try {
+            const { requestID } = req.params;
+            const { status } = req.body;
+            const request = await requestService.editStatusRequestByRoot(requestID, req.user, status);
+            successResponse(res, request, "Edit status request successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async editStatusRequestByManager(req, res, next) {
+        try {
+            const { requestID } = req.params;
+            const { status } = req.body;
+            const request = await requestService.editStatusRequestByManager(requestID, req.user, status);
+            successResponse(res, request, "Edit status request successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = new RequestController();

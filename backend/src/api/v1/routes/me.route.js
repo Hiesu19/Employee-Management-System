@@ -20,6 +20,6 @@ router.put('/request/:requestID', verifyTokenAndCheckRole(['manager', 'employee'
 router.delete('/request/:requestID', verifyTokenAndCheckRole(['manager', 'employee']), RequestController.deleteMyRequest);
 
 router.get('/manager/request', verifyTokenAndCheckRole(['manager']), RequestController.getAllRequestByManager);
-
+router.put('/manager/request/:requestID', verifyTokenAndCheckRole(['manager']), RequestController.editStatusRequestByManager);
 
 module.exports = router;

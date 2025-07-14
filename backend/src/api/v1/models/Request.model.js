@@ -40,11 +40,11 @@ const Request = sequelize.define('Request', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    approvedAt: {
+    checkedAt: {
         type: DataTypes.DATE,
         allowNull: true,
     },
-    approvedBy: {
+    checkedBy: {
         type: DataTypes.STRING,
         allowNull: true,
         references: {
@@ -52,6 +52,10 @@ const Request = sequelize.define('Request', {
             key: 'userID',
         },
         onDelete: 'SET NULL',
+    },
+    checkedByEmail: {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
 }, {
     tableName: 'requests',

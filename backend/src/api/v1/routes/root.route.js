@@ -17,5 +17,6 @@ router.put('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootContr
 router.delete('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootController.deleteEmployee);
 
 router.get('/request', verifyTokenAndCheckRole(['root']), RequestController.getAllRequestByRoot);
+router.put('/request/:requestID', verifyTokenAndCheckRole(['root']), RequestController.editStatusRequestByRoot);
 
 module.exports = router
