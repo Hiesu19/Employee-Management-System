@@ -124,10 +124,24 @@ const getMyCheckInOut = async (userID, offset, limit, dateStart, dateEnd) => {
     };
 };
 
+const createRequest = async (userID, request) => {
+    const request = await Request.create({
+        id: uuidv4(),
+        userID: userID,
+        type: request.type,
+        status: 'pending',
+        fromDate: request.fromDate,
+        toDate: request.toDate,
+        reason: request.reason,
+    });
+    return request;
+}
+
 module.exports = {
     getMyInfo,
     updateMyInfo,
     checkIn,
     checkOut,
-    getMyCheckInOut
+    getMyCheckInOut,
+    createRequest
 }

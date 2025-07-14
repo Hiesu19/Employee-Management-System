@@ -12,5 +12,7 @@ router.post('/avatar', verifyToken, upload.single('avatar'), EmployeeController.
 router.post('/check-in', verifyTokenAndCheckRole(['manager', 'employee']), EmployeeController.checkIn);
 router.post('/check-out', verifyTokenAndCheckRole(['manager', 'employee']), EmployeeController.checkOut);
 router.get('/check-in-out', verifyTokenAndCheckRole(['manager', 'employee']), EmployeeController.getMyCheckInOut);
+router.post('/request', verifyTokenAndCheckRole(['manager', 'employee']), EmployeeController.createRequest);
+
 
 module.exports = router;

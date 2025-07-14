@@ -76,6 +76,16 @@ class EmployeeController {
             next(error);
         }
     }
+
+    async createRequest(req, res, next) {
+        try {
+            const userID = req.user.id;
+            const request = await employeeService.createRequest(userID, req.body);
+            successResponse(res, request, "Create request successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new EmployeeController();  
