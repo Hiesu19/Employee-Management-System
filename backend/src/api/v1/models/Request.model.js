@@ -16,6 +16,10 @@ const Request = sequelize.define('Request', {
         },
         onDelete: 'SET NULL',
     },
+    userEmail: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     type: {
         type: DataTypes.ENUM('sick', 'personal', 'other'),
         allowNull: false,
@@ -36,11 +40,11 @@ const Request = sequelize.define('Request', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    approvalDate: {
+    approvedAt: {
         type: DataTypes.DATE,
         allowNull: true,
     },
-    approvalBy: {
+    approvedBy: {
         type: DataTypes.STRING,
         allowNull: true,
         references: {
@@ -52,8 +56,8 @@ const Request = sequelize.define('Request', {
 }, {
     tableName: 'requests',
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
 });
 
 module.exports = Request;

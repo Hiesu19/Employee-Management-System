@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const RootController = require('../controller/RootController.controller');
+const RequestController = require('../controller/RequestController.controller');
 const { verifyToken, verifyTokenAndCheckRole } = require('../middleware/verify-token.middleware');
 
 
@@ -15,6 +16,6 @@ router.get('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootContr
 router.put('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootController.updateEmployeeInfo);
 router.delete('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootController.deleteEmployee);
 
-
+router.get('/request', verifyTokenAndCheckRole(['root']), RequestController.getAllRequestByRoot);
 
 module.exports = router
