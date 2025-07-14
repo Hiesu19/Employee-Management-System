@@ -129,5 +129,5 @@ module.exports = {
     updateMyInfo,
     checkIn,
     checkOut,
-    getMyCheckInOut
+    getMyCheckInOut,
 }
