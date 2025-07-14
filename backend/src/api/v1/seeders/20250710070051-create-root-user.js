@@ -13,7 +13,7 @@ module.exports = {
         userID: uuidv4(),
         fullName: 'Root Admin',
         email: 'root@example.com',
-        phone: '0900000000',
+        phone: '0800000000',
         password: hashedPassword,
         role: 'root',
         avatarURL: null,
