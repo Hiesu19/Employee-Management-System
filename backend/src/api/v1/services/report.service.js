@@ -46,6 +46,44 @@ const getAllEmployeeInDepartment = async (user) => {
     return buffer;
 }
 
+const getAllEmployeeInCompany = async (user) => {
+    const employeesInCompany = await User.findAll({
+        where: {
+            role: { [Op.or]: ['employee', 'manager'] },
+        },
+        attributes: ['userID', 'fullName', 'email', 'phone', 'role', 'avatarURL', 'departmentID'],
+        include: [{
+            model: Department,
+            attributes: ['departmentName'],
+        }]
+    });
+
+    console.log(employeesInCompany)
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Nhan vien');
+    worksheet.columns = [
+        { header: 'User ID', key: 'userID' },
+        { header: 'Họ và tên', key: 'fullName' },
+        { header: 'Email', key: 'email' },
+        { header: 'Số điện thoại', key: 'phone' },
+        { header: 'Vai trò', key: 'role' },
+        { header: 'Avatar', key: 'avatarURL' },
+        { header: 'Phòng ban', key: 'departmentName' },
+    ];
+
+    employeesInCompany.forEach(emp => {
+        const empData = emp.toJSON();
+        empData.departmentName = empData.Department ? empData.Department.departmentName : 'N/A';
+        delete empData.Department;
+        worksheet.addRow(empData);
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+}
+
 module.exports = {
-    getAllEmployeeInDepartment
+    getAllEmployeeInDepartment,
+    getAllEmployeeInCompany
 }

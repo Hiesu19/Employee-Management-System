@@ -13,6 +13,18 @@ class ReportController {
             next(error);
         }
     }
+
+    async getAllEmployeeInCompany(req, res, next) {
+        try {
+            const buffer = await reportService.getAllEmployeeInCompany(req.user);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=employees.xlsx');
+
+            res.send(buffer);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new ReportController();
