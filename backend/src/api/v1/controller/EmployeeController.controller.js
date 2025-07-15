@@ -76,6 +76,27 @@ class EmployeeController {
             next(error);
         }
     }
+
+    async getMyDepartment(req, res, next) {
+        try {
+            const { offset, limit } = req.query;
+            const myDepartment = await employeeService.getMyDepartment(req.user, offset, limit);
+            successResponse(res, myDepartment, "Get my department successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getMyDepartmentEmployee(req, res, next) {
+        try {
+            const employeeID = req.params.employeeID;
+
+            const myDepartmentEmployee = await employeeService.getMyDepartmentEmployee(req.user, employeeID);
+            successResponse(res, myDepartmentEmployee, "Get my department employee successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new EmployeeController();  

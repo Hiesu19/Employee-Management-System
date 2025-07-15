@@ -124,10 +124,50 @@ const getMyCheckInOut = async (userID, offset, limit, dateStart, dateEnd) => {
     };
 };
 
+const getMyDepartment = async (user, offset, limit) => {
+    const employees = await User.findAll({
+        where: { departmentID: user.departmentID, role: { [Op.or]: ['employee'] } },
+        attributes: { exclude: ['password'] },
+        include: {
+            model: Department,
+            attributes: { exclude: ['departmentID'] }
+        },
+        offset: offset || 0,
+        limit: limit || 10
+    });
+    const result = employees.map(employee => {
+        return {
+            userID: employee.userID,
+            fullName: employee.fullName,
+            email: employee.email,
+            phone: employee.phone,
+            role: employee.role,
+            department: employee.Department.departmentName,
+            avatarURL: employee.avatarURL,
+            createdAt: employee.createdAt,
+            updatedAt: employee.updatedAt,
+
+        }
+    });
+    return result;
+}
+
+const getMyDepartmentEmployee = async (manager, employeeID) => {
+    const employee = await User.findOne({ where: { userID: employeeID } });
+    if (!employee) {
+        throw new ResponseError(404, "Employee not found");
+    }
+    if (employee.departmentID !== manager.departmentID) {
+        throw new ResponseError(403, "You are not allowed to access this employee");
+    }
+    return employee;
+}
 module.exports = {
     getMyInfo,
     updateMyInfo,
     checkIn,
     checkOut,
     getMyCheckInOut,
+    getMyDepartment,
+    getMyDepartmentEmployee
 }
