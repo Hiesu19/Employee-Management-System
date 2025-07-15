@@ -105,6 +105,20 @@ const calculateTotalTimeWorkedByMonth = async (manager, startDate, endDate) => {
             [Op.between]: [startDate, endDate]
         };
     }
+    
+    //nếu chỉ có startDate thì lấy từ startDate đến hôm nay
+    if (startDate && !endDate) {
+        whereCondition.date = {
+            [Op.gte]: startDate
+        };
+    }
+
+    //nếu chỉ có endDate thì lấy từ quá khứ đến endDate 
+    if (!startDate && endDate) {
+        whereCondition.date = {
+            [Op.lte]: endDate
+        };
+    }
 
     const listCheckInOuts = await CheckInOut.findAll({
         where: whereCondition,
@@ -160,20 +174,24 @@ const exportTotalTimeWorkedByMonth = async (manager, startDate, endDate) => {
 
     for (const data of datas) {
         const { userFullName, userEmail, userRole, workTimeAtMonth } = data;
-        const worksheet = workbook.addWorksheet(userFullName.split(' ')[-1] + ' - ' + userEmail);
+        const worksheet = workbook.addWorksheet(userFullName.trim().split(' ').pop() + ' - ' + userEmail);
 
         // Tiêu đề
         worksheet.mergeCells('A1:C1');
-        worksheet.getCell('A1').value = `Báo cáo thời gian từ ${startDate} đến ${endDate}`;
+        worksheet.getCell('A1').value = `Báo cáo thời gian từ ${startDate || "'quá khứ'"} đến ${endDate || "'nay'"}`;
         worksheet.getCell('A1').font = { bold: true };
 
-        // A2: Thông tin họ tên + email
+        // Thông tin họ tên
         worksheet.mergeCells('A2:C2');
-        worksheet.getCell('A2').value = `Họ tên: ${userFullName} - Email: ${userEmail}`;
+        worksheet.getCell('A2').value = `Họ tên: ${userFullName}`;
 
-        // A3: Role
+        // Thông tin email
         worksheet.mergeCells('A3:C3');
-        worksheet.getCell('A3').value = `Vị trí: ${userRole}`;
+        worksheet.getCell('A3').value = `Email: ${userEmail}`;
+
+        // role
+        worksheet.mergeCells('A4:C4');
+        worksheet.getCell('A4').value = `Vị trí: ${userRole === "manager" ? "Quản lý" : "Nhân viên"}`;
 
         //Tạo bảng 
         worksheet.addRow([]); // dòng trống
