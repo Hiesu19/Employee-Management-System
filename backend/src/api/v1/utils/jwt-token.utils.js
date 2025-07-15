@@ -7,6 +7,7 @@ exports.generateAccessToken = (user) => {
             id: user.userID,
             role: user.role,
             email: user.email,
+            departmentID: user.departmentID,
         },
         process.env.JWT_ACCESS_KEY,
         { expiresIn: "2h" }
@@ -20,6 +21,7 @@ exports.generateRefreshToken = (user) => {
             id: user.userID,
             role: user.role,
             email: user.email,
+            departmentID: user.departmentID,
         },
         process.env.JWT_REFRESH_KEY,
         { expiresIn: "7d" }

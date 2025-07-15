@@ -182,7 +182,7 @@ const editStatusRequestByRoot = async (requestID, user, status) => {
     request.checkedByEmail = user.email;
 
     // Gui email
-    const user = await User.findOne({
+    const userFind = await User.findOne({
         where: { userID: request.userID },
         attributes: ['email']
     });
