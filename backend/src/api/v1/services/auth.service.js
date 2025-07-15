@@ -4,11 +4,13 @@ const { v4: uuidv4 } = require('uuid');
 const { User, RefreshToken } = require('../models/index.model');
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt-token.utils');
 const { ResponseError } = require('../error/ResponseError.error');
+const { validateEmail } = require('../validation/email.validation');
 
 // Tạo user
 // Khi tạo xong trả về dữ liệu không có password
 const createUser = async (user) => {
     try {
+        validateEmail(user.email);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(user.password, salt);
 
@@ -42,6 +44,7 @@ const createUser = async (user) => {
 
 // Đăng nhập
 const login = async (email, password) => {
+    validateEmail(email);
     const user = await User.findOne({ where: { email } });
     if (!user) {
         throw new ResponseError(400, "User not found");
