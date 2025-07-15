@@ -25,6 +25,19 @@ class ReportController {
             next(error);
         }
     }
+
+    async getWorkTimeReport(req, res, next) {
+        try {
+            const { startDate, endDate } = req.query;
+            const buffer = await reportService.exportTotalTimeWorkedByMonth(req.user, startDate, endDate);
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=work_time_report.xlsx');
+
+            res.send(buffer);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new ReportController();

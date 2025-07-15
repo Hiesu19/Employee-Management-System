@@ -6,5 +6,6 @@ const { verifyTokenAndCheckRole } = require('../middleware/verify-token.middlewa
 
 router.get('/export/employee-in-department', verifyTokenAndCheckRole(['manager']), ReportController.getAllEmployeeInDepartment);
 router.get('/export/employee-in-company', verifyTokenAndCheckRole(['root']), ReportController.getAllEmployeeInCompany);
+router.get('/work-time', verifyTokenAndCheckRole(['manager']), ReportController.getWorkTimeReport);
 
 module.exports = router;

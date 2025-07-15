@@ -1,9 +1,9 @@
-const { User, Department } = require('../models/index.model');
+const { User, Department, CheckInOut } = require('../models/index.model');
 const ExcelJS = require('exceljs');
 const { Op } = require('sequelize');
 const { ResponseError } = require('../error/ResponseError.error');
 
-const getAllEmployeeInDepartment = async (user) => {
+const exportAllEmployeeInDepartment = async (user) => {
     const departmentID = user.departmentID;
 
     if (!departmentID) {
@@ -46,7 +46,7 @@ const getAllEmployeeInDepartment = async (user) => {
     return buffer;
 }
 
-const getAllEmployeeInCompany = async (user) => {
+const exportAllEmployeeInCompany = async (user) => {
     const employeesInCompany = await User.findAll({
         where: {
             role: { [Op.or]: ['employee', 'manager'] },
@@ -83,7 +83,118 @@ const getAllEmployeeInCompany = async (user) => {
     return buffer;
 }
 
+const calculateTotalTimeWorkedByMonth = async (manager, startDate, endDate) => {
+    // Lấy danh sach nv
+    const listEmployeeAtDepartment = await User.findAll({
+        where: {
+            departmentID: manager.departmentID,
+            role: { [Op.or]: ['employee', 'manager'] }
+        },
+        attributes: ['userID', 'fullName', 'email', 'role']
+    });
+
+    const userIDs = listEmployeeAtDepartment.map(employee => employee.userID);
+
+    let whereCondition = {
+        userID: { [Op.in]: userIDs },
+        checkOutTime: { [Op.not]: null }
+    };
+
+    if (startDate && endDate) {
+        whereCondition.date = {
+            [Op.between]: [startDate, endDate]
+        };
+    }
+
+    const listCheckInOuts = await CheckInOut.findAll({
+        where: whereCondition,
+        attributes: ['userID', 'checkInTime', 'checkOutTime', 'date'],
+        order: [['date', 'ASC']]
+    });
+
+    const result = [];
+
+    for (const employee of listEmployeeAtDepartment) {
+        // Lọc lấy checkinout của nv đó
+        const employeeCheckIns = listCheckInOuts.filter(record => record.userID === employee.userID);
+
+        const workTimeByMonth = {};
+        // Tính tổng thời gian làm trong tháng
+        for (const record of employeeCheckIns) {
+            const dateStr = record.date;
+
+            const checkIn = new Date(`${dateStr}T${record.checkInTime}`);
+            const checkOut = new Date(`${dateStr}T${record.checkOutTime}`);
+            const workMinutes = Math.round((checkOut - checkIn) / (1000 * 60)); // tính phút
+
+            // Lấy tháng năm
+            const monthYear = dateStr.substring(0, 7);
+
+            if (!workTimeByMonth[monthYear]) {
+                workTimeByMonth[monthYear] = {
+                    totalDays: 0,
+                    totalMinutes: 0,
+                };
+            }
+
+            //Tính
+            workTimeByMonth[monthYear].totalMinutes += workMinutes;
+            workTimeByMonth[monthYear].totalDays += 1;
+        }
+
+        result.push({
+            userID: employee.userID,
+            userFullName: employee.fullName,
+            userEmail: employee.email,
+            userRole: employee.role,
+            workTimeAtMonth: workTimeByMonth
+        });
+    }
+
+    return result;
+}
+
+const exportTotalTimeWorkedByMonth = async (manager, startDate, endDate) => {
+    const datas = await calculateTotalTimeWorkedByMonth(manager, startDate, endDate);
+    const workbook = new ExcelJS.Workbook();
+
+    for (const data of datas) {
+        const { userFullName, userEmail, userRole, workTimeAtMonth } = data;
+        const worksheet = workbook.addWorksheet(userFullName.split(' ')[-1] + ' - ' + userEmail);
+
+        // Tiêu đề
+        worksheet.mergeCells('A1:C1');
+        worksheet.getCell('A1').value = `Báo cáo thời gian từ ${startDate} đến ${endDate}`;
+        worksheet.getCell('A1').font = { bold: true };
+
+        // A2: Thông tin họ tên + email
+        worksheet.mergeCells('A2:C2');
+        worksheet.getCell('A2').value = `Họ tên: ${userFullName} - Email: ${userEmail}`;
+
+        // A3: Role
+        worksheet.mergeCells('A3:C3');
+        worksheet.getCell('A3').value = `Vị trí: ${userRole}`;
+
+        //Tạo bảng 
+        worksheet.addRow([]); // dòng trống
+        worksheet.addRow(['Tháng', 'Số ngày đi làm', 'Số phút làm việc']);
+        worksheet.getRow(5).font = { bold: true };
+
+        const sortedMonths = Object.keys(workTimeAtMonth).sort();
+        for (const month of sortedMonths) {
+            const { totalDays, totalMinutes } = workTimeAtMonth[month];
+            worksheet.addRow([month, totalDays, totalMinutes]);
+        }
+
+        worksheet.columns.forEach(column => column.width = 18);
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+}
+
 module.exports = {
-    getAllEmployeeInDepartment,
-    getAllEmployeeInCompany
+    exportAllEmployeeInDepartment,
+    exportAllEmployeeInCompany,
+    exportTotalTimeWorkedByMonth
 }
