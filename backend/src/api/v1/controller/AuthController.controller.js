@@ -26,12 +26,11 @@ class AuthController {
     // Tạo user
     async register(req, res, next) {
         try {
-            const { fullName, email, phone, password, avatarURL } = req.body;
+            const { fullName, email, phone, avatarURL } = req.body;
             const user = {
                 fullName,
                 email,
                 phone,
-                password,
                 avatarURL: avatarURL || null,
             }
 

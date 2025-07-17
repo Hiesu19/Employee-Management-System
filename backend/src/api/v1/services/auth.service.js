@@ -5,6 +5,8 @@ const { User, RefreshToken } = require('../models/index.model');
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt-token.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 const { validateEmail } = require('../validation/email.validation');
+const crypto = require("crypto");
+const { sendEmail } = require('../utils/send-email.utils');
 
 // Tạo user
 // Khi tạo xong trả về dữ liệu không có password
@@ -12,7 +14,8 @@ const createUser = async (user) => {
     try {
         validateEmail(user.email);
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(user.password, salt);
+        const newPassword = crypto.randomBytes(8).toString("base64").replace(/[^a-zA-Z0-9]/g, '').substring(0, 9);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         const newUser = {
             userID: uuidv4(),
@@ -34,6 +37,12 @@ const createUser = async (user) => {
             role: newUserResponse.role,
             createdAt: newUserResponse.createdAt,
             updatedAt: newUserResponse.updatedAt,
+        }
+        if (process.env.NODE_ENV === "dev") {
+            sendEmail([{ "email": newUserResponseWithoutPassword.email, "password": newPassword }], "new-user-dev");
+            console.log("New user: " + newUserResponseWithoutPassword.email + " - Password: " + newPassword);
+        } else {
+            sendEmail([{ "email": newUserResponseWithoutPassword.email, "password": newPassword }], "new-user");
         }
         return newUserResponseWithoutPassword;
     } catch (error) {
