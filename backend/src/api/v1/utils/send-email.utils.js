@@ -61,4 +61,34 @@ const sendEmail = async (data, type) => {
     }
 }
 
-module.exports = { sendEmail };
+const sendEmailHTML = async (data, type) => {
+    let messageData = [];
+
+    if (type === "html") {
+        messageData = {
+            "type": "html",
+            "datas": data       
+        }
+    } else if (type === "html-dev") {
+        messageData = {
+            "type": "html-dev",
+            "datas": data
+        }
+    } else {
+    }
+
+    const command = new SendMessageCommand({
+        QueueUrl: queueURL,
+        MessageBody: JSON.stringify(messageData)
+    });
+
+    try {
+        const result = await sqsClient.send(command);
+        return result;
+    } catch (err) {
+        console.error('Failed to send SQS message:', err);
+        throw new Error(`SQS send failed: ${err.message || err}`);
+    }
+}
+
+module.exports = { sendEmail, sendEmailHTML };
