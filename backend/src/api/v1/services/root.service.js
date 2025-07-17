@@ -43,6 +43,7 @@ const getAllEmployeeInfo = async (page, limit) => {
 }
 
 const searchEmployeeByEmailOrName = async (email, name) => {
+    validateEmail(email);
     const whereConditions = [];
 
     if (email) {

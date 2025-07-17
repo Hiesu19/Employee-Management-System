@@ -3,9 +3,16 @@ const { checkTimeFromDateBeforeToDate } = require('../validation/time.validation
 const { ResponseError } = require('../error/ResponseError.error');
 const { v4: uuidv4 } = require('uuid');
 const { Op } = require('sequelize');
+const { sendEmailHTML } = require('../utils/send-email.utils');
+const { genRequestHTML } = require('../utils/gen-requestHTML.utils');
 
 const createRequest = async (user, request) => {
     checkTimeFromDateBeforeToDate(request.fromDate, request.toDate);
+    const userFound = await User.findOne({ where: { userID: user.id } });
+
+    if (!userFound) {
+        throw new ResponseError(404, "User not found");
+    }
 
     const newRequest = await Request.create({
         id: uuidv4(),
@@ -18,13 +25,55 @@ const createRequest = async (user, request) => {
         reason: request.reason,
     });
 
-    // Gui email ()
+    const html = genRequestHTML(userFound, newRequest);
+
+    // Gui email cho manager và root trong department
     if (user.role === 'employee') {
-        const mailTo = await User.findOne({ where: { role: 'manager' || 'root', departmentID: user.departmentID } });
-    } else {
-        const mailTo = await User.findOne({ where: { role: 'root' } });
+        const mailToList = await User.findAll({
+            where: {
+                role: { [Op.in]: ['manager', 'root'] },
+                departmentID: user.departmentID
+            },
+            attributes: { exclude: ['password'] }
+        });
+
+        if (mailToList && mailToList.length > 0) {
+            let data = [];
+            for (const mail of mailToList) {
+                data.push({
+                    "toMail": mail.email,
+                    "subject": "Yêu cầu nghỉ của " + userFound.fullName + " đã được gửi tới bạn <`" + mail.email + "`>",
+                    "htmlBody": html
+                });
+            }
+            if (process.env.NODE_ENV === "dev") {
+                sendEmailHTML(data, "html-dev");
+            } else {
+                sendEmailHTML(data, "html");
+            }
+        }
+    } else { // Gui email cho root
+        const mailTo = await User.findAll({
+            where: { role: 'root' },
+            attributes: { exclude: ['password'] }
+        });
+
+        if (mailTo && mailTo.length > 0) {
+            let data = [];
+            for (const mail of mailTo) {
+                data.push({
+                    "toMail": mail.email,
+                    "subject": "Yêu cầu nghỉ của " + userFound.fullName + " đã được gửi tới bạn <`" + mail.email + "`>",
+                    "htmlBody": html
+                });
+            }
+            if (process.env.NODE_ENV === "dev") {
+                sendEmailHTML(data, "html-dev");
+            } else {
+                sendEmailHTML(data, "html");
+            }
+        }
     }
-    ;
     return newRequest;
 }
 
