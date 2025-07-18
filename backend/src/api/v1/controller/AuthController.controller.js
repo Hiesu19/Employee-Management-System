@@ -1,6 +1,7 @@
 const authService = require('../services/auth.service');
 
-const { successResponse, errorResponse } = require('../utils/response.utils');
+const { changePassword } = require('../services/auth.service');
+const { successResponse, errorResponse,  } = require('../utils/response.utils');
 const { ResponseError } = require('../error/ResponseError.error');
 
 class AuthController {
@@ -72,6 +73,18 @@ class AuthController {
 
             res.clearCookie("refreshToken");
             successResponse(res, { data: "Logout successfully" }, "Logout successfully");
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+
+    // Đổi mật khẩu
+    async changePassword(req, res, next) {
+        try {
+            const { currentPassword, newPassword } = req.body;
+            await authService.changePassword(currentPassword, newPassword, req.user.id);
+            successResponse(res, { data: "Change password successfully" }, "Change password successfully");
         }
         catch (error) {
             next(error);

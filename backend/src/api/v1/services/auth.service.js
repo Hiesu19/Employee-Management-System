@@ -135,4 +135,27 @@ const logout = async (refreshToken) => {
     }
 }
 
-module.exports = { createUser, login, saveRefreshToken, refreshTokenHandler, logout };
+// Đổi mật khẩu
+const changePassword = async (currentPassword, newPassword, userID) => {
+    try {
+        const user = await User.findOne({ where: { userID } });
+        if (!user) {
+            throw new ResponseError(400, "User not found");
+        }
+
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordValid) {
+            throw new ResponseError(400, "Invalid current password");
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        await User.update({ password: hashedPassword, mustChangePassword: false }, { where: { userID } });
+        return { message: "Change password successfully" };
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+module.exports = { createUser, login, saveRefreshToken, refreshTokenHandler, logout, changePassword };
