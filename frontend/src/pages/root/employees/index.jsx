@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Paper,
@@ -47,6 +48,7 @@ const getRoleLabel = (role) => {
 };
 
 export default function Employees() {
+    const navigate = useNavigate();
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -144,6 +146,16 @@ export default function Employees() {
                     Quản lý nhân viên
                 </Typography>
 
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3, gap: 2 }}>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => navigate('/root/employees/add')}
+                    >
+                        Thêm nhân viên
+                    </Button>
+                </Box>
+
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
                     <Button
                         variant="contained"
@@ -205,7 +217,7 @@ export default function Employees() {
                                         Vai trò
                                     </TableCell>
                                     <TableCell sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
-                                        Ngày tạo
+                                        Phòng ban
                                     </TableCell>
                                     <TableCell sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
                                         Thao tác
@@ -255,7 +267,7 @@ export default function Employees() {
                                                     size="small"
                                                 />
                                             </TableCell>
-                                            <TableCell>{formatDate(employee.createdAt)}</TableCell>
+                                            <TableCell>{employee.Department?.departmentName}</TableCell>
                                             <TableCell>
                                                 <Stack direction="row" spacing={1}>
                                                     <IconButton

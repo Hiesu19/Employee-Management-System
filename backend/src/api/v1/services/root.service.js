@@ -28,7 +28,11 @@ const getAllEmployeeInfo = async (page, limit) => {
         const employees = await User.findAll({
             attributes: {
                 exclude: ['password']
-            }
+            },
+            include: [{
+                model: Department,
+                attributes: ['departmentName', 'departmentID']
+            }]
         });
         return { totalEmployees, employees };
     }
@@ -38,7 +42,11 @@ const getAllEmployeeInfo = async (page, limit) => {
         limit,
         attributes: {
             exclude: ['password']
-        }
+        },
+        include: [{
+            model: Department,
+            attributes: ['departmentName', 'departmentID']
+        }]
     });
     return { totalEmployees, employees };
 }

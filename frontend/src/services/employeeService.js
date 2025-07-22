@@ -11,9 +11,20 @@ export const getAllEmployees = async (page = 1, limit = 10) => {
     }
 };
 
-export const resetPassword = async (listUserID) => {
+export const createEmployee = async (employeeData) => {
     try {
-        const response = await axios.put("/root/employee/reset-password", { employeeIDArray: listUserID });
+        const response = await axios.post("/auth/register", employeeData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const resetPassword = async (userIDs) => {
+    try {
+        const response = await axios.put("/root/employee/reset-password", {
+            employeeIDArray: userIDs
+        });
         return response.data;
     } catch (error) {
         throw error;
