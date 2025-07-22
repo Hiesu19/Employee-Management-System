@@ -15,13 +15,18 @@ import {
     IconButton,
     Alert,
     CircularProgress,
-    Stack
+    Stack,
+    Checkbox,
+    Button,
+    Menu,
+    MenuItem,
+    Snackbar
 } from '@mui/material';
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
 } from '@mui/icons-material';
-import { getAllEmployees } from '../../../services/employeeService';
+import { getAllEmployees, resetPassword } from '../../../services/employeeService';
 
 const getRoleColor = (role) => {
     switch (role) {
@@ -45,10 +50,14 @@ export default function Employees() {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [totalEmployees, setTotalEmployees] = useState(0);
+
+    const [selectedEmployees, setSelectedEmployees] = useState([]);
+    const [successResetPassword, setSuccessResetPassword] = useState(false);
 
     const fetchEmployees = async (pageNumber = 1, limit = 10) => {
         try {
@@ -82,6 +91,44 @@ export default function Employees() {
         fetchEmployees(1, newRowsPerPage);
     };
 
+    // đổi mật khẩu cho nhân viên đã chọn
+    const handleResetPasswordForSelectedEmployees = async () => {
+        const confirm = window.confirm('Bạn có chắc chắn muốn đặt lại mật khẩu cho nhân viên đã chọn?');
+        if (!confirm) return;
+
+        const listUserID = selectedEmployees;
+        const response = await resetPassword(listUserID);
+        if (response.success === 'success') {
+            setSelectedEmployees([]);
+            setSuccessResetPassword(true);
+            setAnchorEl(null);
+            fetchEmployees(1, rowsPerPage);
+        } else {
+            setError('Không thể đặt lại mật khẩu');
+        }
+    }
+
+    // đổi mật khẩu cho tất cả hệ thống
+    const handleResetPasswordForAllEmployees = async () => {
+        const confirm = window.confirm('Bạn có chắc chắn muốn đặt lại mật khẩu cho tất cả nhân viên?');
+        if (!confirm) return;
+
+        const allEmployees = await getAllEmployees(null, null);
+        const listUserID = allEmployees.data.employees.map(employee => employee.userID);
+        const response = await resetPassword(listUserID);
+        if (response.success === 'success') {
+            setSuccessResetPassword(true);
+            setAnchorEl(null);
+            fetchEmployees(1, rowsPerPage);
+        } else {
+            setError('Không thể đặt lại mật khẩu');
+        }
+    }
+
+    const handleCloseSuccessSnackbar = () => {
+        setSuccessResetPassword(false);
+    }
+
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('vi-VN');
     };
@@ -92,9 +139,39 @@ export default function Employees() {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-                Quản lý nhân viên
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
+                    Quản lý nhân viên
+                </Typography>
+
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={(e) => setAnchorEl(e.currentTarget)}
+                    >
+                        Tùy chọn
+                    </Button>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={() => setAnchorEl(null)}
+                    >
+                        <MenuItem
+                            disabled={selectedEmployees.length === 0}
+                            onClick={handleResetPasswordForSelectedEmployees}
+                        >
+                            Đặt lại mật khẩu ({selectedEmployees.length})
+                        </MenuItem>
+                        <MenuItem
+                            onClick={handleResetPasswordForAllEmployees}
+                        >
+                            Đặt lại mật khẩu tất cả
+                        </MenuItem>
+                    </Menu>
+                </Box>
+            </Box>
+
 
             {error && (
                 <Alert severity="error" sx={{ mb: 3 }}>
@@ -102,7 +179,6 @@ export default function Employees() {
                 </Alert>
             )}
 
-            {/* Loading */}
             {loading && (
                 <Box display="flex" justifyContent="center" p={4}>
                     <CircularProgress />
@@ -133,6 +209,9 @@ export default function Employees() {
                                     </TableCell>
                                     <TableCell sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
                                         Thao tác
+                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: 600, bgcolor: '#f8f9fa' }}>
+                                        Chọn
                                     </TableCell>
                                 </TableRow>
                             </TableHead>
@@ -195,6 +274,20 @@ export default function Employees() {
                                                     </IconButton>
                                                 </Stack>
                                             </TableCell>
+                                            <TableCell>
+                                                {/* //Thêm checkbox vào đây */}
+                                                <Checkbox
+                                                    size="small"
+                                                    checked={selectedEmployees.includes(employee.userID)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedEmployees([...selectedEmployees, employee.userID]);
+                                                        } else {
+                                                            setSelectedEmployees(selectedEmployees.filter(id => id !== employee.userID));
+                                                        }
+                                                    }}
+                                                />
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 )}
@@ -224,6 +317,22 @@ export default function Employees() {
                     />
                 </Paper>
             )}
+
+            {/* Success Snackbar */}
+            <Snackbar
+                open={successResetPassword}
+                autoHideDuration={4000}
+                onClose={handleCloseSuccessSnackbar}
+                message="Đặt lại mật khẩu thành công!"
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{
+                    '& .MuiSnackbarContent-root': {
+                        backgroundColor: '#4caf50',
+                        color: 'white',
+                        fontWeight: 500,
+                    },
+                }}
+            />
         </Box>
     );
 }
