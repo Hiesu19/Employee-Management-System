@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearLocalStorage, authenticated } from "../../services/authService";
+import { clearLocalStorage, authenticated, changePassword } from "../../services/authService";
 import {
     Box,
     Container,
@@ -39,14 +39,11 @@ function ChangePassword() {
         }
 
         setIsLoading(true);
+
         try {
-            // TODO: Gọi API đổi mật khẩu thực tế
-            // const response = await changePassword(currentPassword, password, confirmPassword);
+            const success = await changePassword(currentPassword, password);
 
-            // Mock response để test
-            const response = { success: "success" };
-
-            if (response.success === "success") {
+            if (success) {
                 setSuccess("Đổi mật khẩu thành công! Đang đăng xuất...");
                 clearLocalStorage();
                 setTimeout(() => navigate("/login", { replace: true }), 2000);
@@ -61,14 +58,6 @@ function ChangePassword() {
             setError(errorMessage);
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleCancel = () => {
-        // Chỉ cho phép hủy nếu không bắt buộc đổi mật khẩu
-        const authStatus = authenticated();
-        if (authStatus === 1) {
-            navigate("/", { replace: true });
         }
     };
 
@@ -202,60 +191,40 @@ function ChangePassword() {
                             }}
                         />
 
-                        <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-                            {/* Chỉ hiển thị nút Hủy nếu không bắt buộc đổi mật khẩu */}
-                            {!isMustChange && (
-                                <Button
-                                    variant="outlined"
-                                    size="large"
-                                    fullWidth
-                                    onClick={handleCancel}
-                                    disabled={isLoading}
-                                    sx={{
-                                        py: 1.5,
-                                        fontWeight: 600,
-                                        fontSize: "1.1rem",
-                                        textTransform: "none",
-                                        borderRadius: 2,
-                                        borderColor: "#667eea",
-                                        color: "#667eea",
-                                        "&:hover": {
-                                            borderColor: "#5a6fd8",
-                                            backgroundColor: "rgba(102, 126, 234, 0.1)",
-                                        },
-                                        "&:disabled": {
-                                            borderColor: "rgba(102, 126, 234, 0.3)",
-                                            color: "rgba(102, 126, 234, 0.3)",
-                                        },
-                                    }}
-                                >
-                                    Hủy
-                                </Button>
-                            )}
+                        <Box sx={{ mt: 3 }}>
                             <Button
                                 type="submit"
-                                fullWidth={isMustChange}
+                                fullWidth
                                 variant="contained"
                                 size="large"
                                 disabled={isLoading}
                                 sx={{
                                     py: 1.5,
-                                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                    background: isLoading
+                                        ? "rgba(102, 126, 234, 0.5)"
+                                        : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                                     color: "white",
                                     fontWeight: 600,
                                     fontSize: "1.1rem",
                                     textTransform: "none",
                                     borderRadius: 2,
-                                    boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+                                    boxShadow: isLoading
+                                        ? "none"
+                                        : "0 4px 15px rgba(102, 126, 234, 0.4)",
                                     transition: "all 0.3s ease",
                                     "&:hover": {
-                                        background: "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
-                                        boxShadow: "0 6px 20px rgba(102, 126, 234, 0.6)",
-                                        transform: "translateY(-2px)",
+                                        background: isLoading
+                                            ? "rgba(102, 126, 234, 0.5)"
+                                            : "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
+                                        boxShadow: isLoading
+                                            ? "none"
+                                            : "0 6px 20px rgba(102, 126, 234, 0.6)",
+                                        transform: isLoading ? "none" : "translateY(-2px)",
                                     },
                                     "&:disabled": {
                                         background: "rgba(102, 126, 234, 0.5)",
                                         color: "rgba(255, 255, 255, 0.7)",
+                                        cursor: "not-allowed",
                                     },
                                 }}
                             >

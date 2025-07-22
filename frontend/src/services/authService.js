@@ -13,6 +13,23 @@ export const login = async (email, password) => {
     }
 }
 
+export const changePassword = async (currentPassword, newPassword) => {
+    try {
+        const response = await axios.post("/auth/change-password", { currentPassword, newPassword }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        });
+        console.log("changePassword", response.data);
+        if (response.data.success === "success") {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        throw error;
+    }
+}
+
 // 0: Chưa đăng nhập
 // 1: Đã đăng nhập
 // 2: Cần đổi mật khẩu
@@ -59,3 +76,4 @@ export const clearLocalStorage = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
 }
+
