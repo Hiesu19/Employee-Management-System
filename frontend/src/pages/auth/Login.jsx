@@ -40,7 +40,6 @@ function Login() {
 
 		try {
 			const response = await login(email, password);
-			console.log(response);
 
 			if (response.success === "success") {
 				setSuccess("Đăng nhập thành công!");

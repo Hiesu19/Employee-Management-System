@@ -31,9 +31,24 @@ import { getUser, logout } from "../services/authService";
 
 const drawerWidth = 260;
 
-const menuItems = [
-    { text: "Trang chủ", icon: HomeIcon, path: "/" },
-];
+const menuConfig = {
+    root: [
+        { text: "Trang chủ", icon: HomeIcon, path: "/" },
+        { text: "Quản lý nhân viên", icon: DashboardIcon, path: "/root/employees" },
+        { text: "Báo cáo", icon: SettingsIcon, path: "/root/reports" },
+    ],
+    manager: [
+        { text: "Trang chủ", icon: HomeIcon, path: "/" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/manager/checkin" },
+        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/manager/profile" },
+    ],
+    employee: [
+        { text: "Trang chủ", icon: HomeIcon, path: "/" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/employee/checkin" },
+        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/employee/profile" },
+    ],
+};
+
 
 function MainLayout() {
     const theme = useTheme();
@@ -44,6 +59,9 @@ function MainLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const user = getUser();
+
+    const role = user?.role
+    const menuItems = menuConfig[role] || [];
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -330,6 +348,7 @@ function MainLayout() {
             {/* Main Content */}
             <Box
                 component="main"
+                className="main-content"
                 sx={{
                     flexGrow: 1,
                     height: "100vh",

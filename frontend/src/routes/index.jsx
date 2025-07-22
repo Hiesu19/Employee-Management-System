@@ -4,14 +4,19 @@ import Login from "../pages/auth/Login";
 import Home from "../pages/main/Home";
 import MustChangePassword from "../pages/auth/MustChangePassword";
 import NotFound from "../pages/error/NotFound";
+import Unauthorized from "../pages/error/Unauthorized"; 
 
 import ProtectedRoute from "../components/ProtectedRoute";
+import RequireRole from "../components/RequireRole";
 import MainLayout from "../layouts/MainLayout";
+
+import Employees from "../pages/root/employees";
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
       <Route path="/must-change-password" element={<ProtectedRoute />}>
         <Route index element={<MustChangePassword />} />
@@ -20,6 +25,10 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+
+          <Route element={<RequireRole allowedRoles={["root"]} />}>
+            <Route path="/root/employees" element={<Employees />} />
+          </Route>
         </Route>
       </Route>
 

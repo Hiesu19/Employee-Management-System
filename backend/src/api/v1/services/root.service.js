@@ -23,13 +23,14 @@ const getAllEmployeeInfo = async (page, limit) => {
     if (page < 0 || limit < 0) {
         throw new ResponseError(400, "Page and limit must be greater than 0");
     }
+    const totalEmployees = await User.count();
     if ((page === 0 && limit === 0) || (page === null || limit === null)) {
         const employees = await User.findAll({
             attributes: {
                 exclude: ['password']
             }
         });
-        return employees;
+        return { totalEmployees, employees };
     }
     const offset = (page - 1) * limit;
     const employees = await User.findAll({
@@ -39,7 +40,7 @@ const getAllEmployeeInfo = async (page, limit) => {
             exclude: ['password']
         }
     });
-    return employees;
+    return { totalEmployees, employees };
 }
 
 const searchEmployeeByEmailOrName = async (email, name) => {
