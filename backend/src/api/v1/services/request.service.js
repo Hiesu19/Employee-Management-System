@@ -237,7 +237,6 @@ const editStatusRequestByRoot = async (requestID, user, status) => {
     });
     const mailTo = user?.email;
 
-
     await request.save();
 }
 
