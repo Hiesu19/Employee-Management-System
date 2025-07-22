@@ -3,24 +3,59 @@ import axios from "./axios";
 export const login = async (email, password) => {
     try {
         const response = await axios.post("/auth/login", { email, password });
-
-        // Lưu token và user vào localStorage
         if (response.data.success === "success") {
             localStorage.setItem("accessToken", response.data.data.accessToken);
             localStorage.setItem("user", JSON.stringify(response.data.data.user));
         }
-
         return response.data;
     } catch (error) {
         throw error;
     }
 }
 
-export const isAuthenticated = () => {
-    const token = localStorage.getItem("accessToken");
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    if (token && user) {
-        return true;
+// 0: Chưa đăng nhập
+// 1: Đã đăng nhập
+// 2: Cần đổi mật khẩu
+export const authenticated = () => {
+    try {
+        const token = localStorage.getItem("accessToken");
+        const userStr = localStorage.getItem("user");
+
+        if (!token || !userStr) return 0;
+
+        const user = JSON.parse(userStr);
+
+        if (typeof user !== "object" || user === null) return 0;
+
+        if (user.mustChangePassword === true) return 2;
+        return 1;
+    } catch (e) {
+        clearLocalStorage();
+        return 0;
     }
-    return false;
+};
+
+
+export const getUser = () => {
+    try {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) return null;
+
+        const user = JSON.parse(userStr);
+        if (!user || !user.id) return null;
+        console.log("user", user);
+        return user;
+    } catch (e) {
+        clearLocalStorage();
+        return null;
+    }
+}
+
+export const getAccessToken = () => {
+    return localStorage.getItem("accessToken");
+}
+
+export const clearLocalStorage = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
 }

@@ -9,23 +9,26 @@ import {
 	Container,
 } from "@mui/material";
 
-import { login } from "../services/authService";
+import { login, authenticated } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
-import { isAuthenticated } from "../services/authService";
 
 function Login() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
 	console.log("Account demo: root@example.com / 123456@");
 
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (isAuthenticated()) {
-			navigate("/");
+		const authStatus = authenticated();
+		if (authStatus === 1) {
+			navigate("/", { replace: true });
+		} else if (authStatus === 2) {
+			navigate("/change-password", { replace: true });
 		}
 	}, [navigate]);
 
@@ -33,17 +36,20 @@ function Login() {
 		e.preventDefault();
 		setError("");
 		setSuccess("");
+		setIsLoading(true);
 
 		try {
 			const response = await login(email, password);
 			console.log(response);
+
 			if (response.success === "success") {
-				if (response.data.user.mustChangePassword === "true") {
-					setSuccess("Đăng nhập thành công! Vui lòng đổi mật khẩu");
-					setTimeout(() => navigate("/change-password"), 500);
-				} else {
-					setSuccess("Đăng nhập thành công!");
-					setTimeout(() => navigate("/"), 500);
+				setSuccess("Đăng nhập thành công!");
+
+				const authStatus = authenticated();
+				if (authStatus === 2) {
+					setTimeout(() => navigate("/change-password", { replace: true }), 1000);
+				} else if (authStatus === 1) {
+					setTimeout(() => navigate("/", { replace: true }), 1000);
 				}
 			} else {
 				setError("Đăng nhập thất bại");
@@ -54,6 +60,8 @@ function Login() {
 				error.message ||
 				"Đăng nhập thất bại. Vui lòng thử lại.";
 			setError(errorMessage);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -179,6 +187,7 @@ function Login() {
 								onChange={(e) => setEmail(e.target.value)}
 								margin="normal"
 								required
+								disabled={isLoading}
 								sx={{
 									mb: 2,
 									"& .MuiOutlinedInput-root": {
@@ -195,6 +204,7 @@ function Login() {
 								onChange={(e) => setPassword(e.target.value)}
 								margin="normal"
 								required
+								disabled={isLoading}
 								sx={{
 									mb: 3,
 									"& .MuiOutlinedInput-root": {
@@ -208,6 +218,7 @@ function Login() {
 								fullWidth
 								variant="contained"
 								size="large"
+								disabled={isLoading}
 								sx={{
 									mt: 2,
 									py: 1.5,
@@ -224,9 +235,13 @@ function Login() {
 										boxShadow: "0 6px 20px rgba(102, 126, 234, 0.6)",
 										transform: "translateY(-2px)",
 									},
+									"&:disabled": {
+										background: "rgba(102, 126, 234, 0.5)",
+										color: "rgba(255, 255, 255, 0.7)",
+									},
 								}}
 							>
-								Đăng nhập
+								{isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
 							</Button>
 						</Box>
 					</Paper>
