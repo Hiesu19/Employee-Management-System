@@ -3,16 +3,14 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
     Box,
     Drawer,
-    AppBar,
-    Toolbar,
     List,
     Typography,
     Divider,
     IconButton,
     ListItem,
     ListItemButton,
-    ListItemIcon,
     ListItemText,
+    ListItemIcon,
     Avatar,
     Menu,
     MenuItem,
@@ -20,21 +18,21 @@ import {
     useMediaQuery,
 } from "@mui/material";
 import {
-    Menu as MenuIcon,
     Home as HomeIcon,
+    Dashboard as DashboardIcon,
     Settings as SettingsIcon,
     Person as PersonIcon,
-    Logout as LogoutIcon,
-    Dashboard as DashboardIcon,
+    ExitToApp as LogoutIcon,
+    ChevronRight as ChevronRightIcon,
+    ChevronLeft as ChevronLeftIcon,
+    ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 import { getUser, clearLocalStorage } from "../services/authService";
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const menuItems = [
-    { text: "Trang chủ", icon: <HomeIcon />, path: "/" },
-    { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-    { text: "Cài đặt", icon: <SettingsIcon />, path: "/settings" },
+    { text: "Trang chủ", icon: HomeIcon, path: "/" },
 ];
 
 function MainLayout() {
@@ -42,6 +40,7 @@ function MainLayout() {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    
     const navigate = useNavigate();
     const location = useLocation();
     const user = getUser();
@@ -69,6 +68,11 @@ function MainLayout() {
         handleMenuClose();
     };
 
+    const handleChangeAvatar = () => {
+        navigate("/change-avatar");
+        handleMenuClose();
+    };
+
     const handleMenuItemClick = (path) => {
         navigate(path);
         if (isMobile) {
@@ -77,185 +81,228 @@ function MainLayout() {
     };
 
     const drawer = (
-        <Box>
-            {/* Logo/Brand */}
+        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+            {/* Header */}
             <Box
                 sx={{
-                    p: 2,
+                    p: 3,
                     textAlign: "center",
                     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                     color: "white",
                 }}
             >
-                <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700 }}>
+                <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
                     Hiesu
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                    Hệ thống quản lý
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    Hệ thống quản lý nhân sự
                 </Typography>
             </Box>
 
             <Divider />
 
             {/* Navigation Menu */}
-            <List>
-                {menuItems.map((item) => (
-                    <ListItem key={item.text} disablePadding>
-                        <ListItemButton
-                            selected={location.pathname === item.path}
-                            onClick={() => handleMenuItemClick(item.path)}
-                            sx={{
-                                "&.Mui-selected": {
-                                    backgroundColor: "rgba(102, 126, 234, 0.1)",
-                                    borderRight: "3px solid #667eea",
-                                    "& .MuiListItemIcon-root": {
-                                        color: "#667eea",
-                                    },
-                                    "& .MuiListItemText-primary": {
-                                        color: "#667eea",
-                                        fontWeight: 600,
-                                    },
-                                },
-                                "&:hover": {
-                                    backgroundColor: "rgba(102, 126, 234, 0.05)",
-                                },
-                            }}
-                        >
-                            <ListItemIcon>{item.icon}</ListItemIcon>
-                            <ListItemText primary={item.text} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List>
+            <Box sx={{ flex: 1, py: 2 }}>
+                <List>
+                    {menuItems.map((item) => {
+                        const IconComponent = item.icon;
+                        return (
+                            <ListItem key={item.text} disablePadding sx={{ px: 1, mb: 0.5 }}>
+                                <ListItemButton
+                                    selected={location.pathname === item.path}
+                                    onClick={() => handleMenuItemClick(item.path)}
+                                    sx={{
+                                        borderRadius: 2,
+                                        "&.Mui-selected": {
+                                            backgroundColor: "rgba(102, 126, 234, 0.15)",
+                                            color: "#667eea",
+                                            fontWeight: 600,
+                                            "&:hover": {
+                                                backgroundColor: "rgba(102, 126, 234, 0.2)",
+                                            },
+                                        },
+                                        "&:hover": {
+                                            backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                        },
+                                    }}
+                                >
+                                    <ListItemIcon
+                                        sx={{
+                                            color: location.pathname === item.path ? "#667eea" : "inherit",
+                                            minWidth: 40,
+                                        }}
+                                    >
+                                        <IconComponent />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={item.text}
+                                        primaryTypographyProps={{
+                                            fontSize: "0.95rem",
+                                            fontWeight: location.pathname === item.path ? 600 : 500
+                                        }}
+                                    />
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    })}
+                </List>
+            </Box>
 
             <Divider />
 
             {/* User Info */}
-            <Box sx={{ p: 2, mt: "auto" }}>
+            <Box sx={{ p: 2 }}>
                 <Box
                     sx={{
                         display: "flex",
                         alignItems: "center",
-                        p: 1,
-                        borderRadius: 1,
-                        backgroundColor: "rgba(0, 0, 0, 0.02)",
+                        p: 2,
+                        borderRadius: 2,
+                        backgroundColor: "rgba(0, 0, 0, 0.03)",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                            backgroundColor: "rgba(0, 0, 0, 0.06)",
+                        },
                     }}
+                    onClick={handleMenuClick}
                 >
-                    <Avatar sx={{ width: 32, height: 32, mr: 1, bgcolor: "#667eea" }}>
-                        {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                    <Avatar
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            mr: 2,
+                            bgcolor: "#667eea",
+                            fontSize: "1.2rem",
+                            fontWeight: 600,
+                        }}
+                    >
+                        {user.avatarURL ? (
+                            <img
+                                src={user.avatarURL}
+                                alt="avatar"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "cover",
+                                    borderRadius: "50%",
+                                }}
+                            />
+                        ) : (
+                            user?.fullName?.charAt(0)?.toUpperCase() || "U"
+                        )}
                     </Avatar>
+
+
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                            {user?.name || "User"}
+                        <Typography variant="body1" noWrap sx={{ fontWeight: 600 }}>
+                            {user?.fullName || "User"}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" noWrap>
                             {user?.email || "user@example.com"}
                         </Typography>
                     </Box>
+                    <ExpandMoreIcon sx={{ fontSize: "20px", opacity: 0.7 }} />
                 </Box>
+
+                <Menu
+                    anchorEl={anchorEl}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: 2,
+                            minWidth: 200,
+                            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                        }
+                    }}
+                >
+                    <MenuItem onClick={handleChangePassword} sx={{ py: 1.5 }}>
+                        <PersonIcon sx={{ mr: 2 }} />
+                        <Typography>Đổi mật khẩu</Typography>
+                    </MenuItem>
+
+                    <MenuItem onClick={handleChangeAvatar} sx={{ py: 1.5 }}>
+                        <PersonIcon sx={{ mr: 2 }} />
+                        <Typography>Đổi ảnh đại diện</Typography>
+                    </MenuItem>
+
+                    <Divider />
+
+                    <MenuItem onClick={handleLogout} sx={{ py: 1.5, color: "error.main" }}>
+                        <LogoutIcon sx={{ mr: 2 }} />
+                        <Typography>Đăng xuất</Typography>
+                    </MenuItem>
+                </Menu>
             </Box>
         </Box>
     );
 
     return (
-        <Box sx={{ display: "flex" }}>
-            {/* App Bar */}
-            <AppBar
-                position="fixed"
-                sx={{
-                    width: { md: `calc(100% - ${drawerWidth}px)` },
-                    ml: { md: `${drawerWidth}px` },
-                    backgroundColor: "white",
-                    color: "text.primary",
-                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                }}
-            >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { md: "none" } }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
+        <Box sx={{
+            display: "flex",
+            height: "100vh",
+            width: "100vw",
+            overflow: "hidden"
+        }}>
+            {isMobile && (
+                <IconButton
+                    onClick={handleDrawerToggle}
+                    sx={{
+                        position: "fixed",
+                        top: 20,
+                        left: mobileOpen ? drawerWidth - 20 : 10,
+                        zIndex: theme.zIndex.drawer + 2,
+                        width: 40,
+                        height: 40,
+                        backgroundColor: "white",
+                        color: "#667eea",
+                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+                        border: "1px solid rgba(102, 126, 234, 0.2)",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                            backgroundColor: "#667eea",
+                            color: "white",
+                            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+                        },
+                    }}
+                >
+                    {mobileOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </IconButton>
+            )}
 
-                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-                        {/* Title sẽ được set động dựa trên trang hiện tại */}
-                    </Typography>
-
-                    {/* User Menu */}
-                    <IconButton
-                        size="large"
-                        aria-label="account of current user"
-                        aria-controls="menu-appbar"
-                        aria-haspopup="true"
-                        onClick={handleMenuClick}
-                        color="inherit"
-                    >
-                        <Avatar sx={{ width: 32, height: 32, bgcolor: "#667eea" }}>
-                            {user?.name?.charAt(0)?.toUpperCase() || "U"}
-                        </Avatar>
-                    </IconButton>
-                    <Menu
-                        id="menu-appbar"
-                        anchorEl={anchorEl}
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                    >
-                        <MenuItem onClick={handleChangePassword}>
-                            <ListItemIcon>
-                                <PersonIcon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText>Đổi mật khẩu</ListItemText>
-                        </MenuItem>
-                        <Divider />
-                        <MenuItem onClick={handleLogout}>
-                            <ListItemIcon>
-                                <LogoutIcon fontSize="small" />
-                            </ListItemIcon>
-                            <ListItemText>Đăng xuất</ListItemText>
-                        </MenuItem>
-                    </Menu>
-                </Toolbar>
-            </AppBar>
-
-            {/* Sidebar Drawer */}
+            {/* Sidebar */}
             <Box
                 component="nav"
-                sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-                aria-label="mailbox folders"
+                sx={{
+                    width: { md: drawerWidth },
+                    flexShrink: { md: 0 },
+                    height: "100vh"
+                }}
             >
-                {/* Mobile drawer */}
+                {/* Mobile Drawer */}
                 <Drawer
                     variant="temporary"
                     open={mobileOpen}
                     onClose={handleDrawerToggle}
-                    ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
-                    }}
+                    ModalProps={{ keepMounted: true }}
                     sx={{
                         display: { xs: "block", md: "none" },
                         "& .MuiDrawer-paper": {
                             boxSizing: "border-box",
                             width: drawerWidth,
+                            borderRight: "none",
+                            boxShadow: "0 0 20px rgba(0, 0, 0, 0.1)",
+                            height: "100vh"
                         },
                     }}
                 >
                     {drawer}
                 </Drawer>
 
-                {/* Desktop drawer */}
+                {/* Desktop Drawer */}
                 <Drawer
                     variant="permanent"
                     sx={{
@@ -263,6 +310,10 @@ function MainLayout() {
                         "& .MuiDrawer-paper": {
                             boxSizing: "border-box",
                             width: drawerWidth,
+                            borderRight: "1px solid rgba(0, 0, 0, 0.08)",
+                            boxShadow: "2px 0 8px rgba(0, 0, 0, 0.04)",
+                            height: "100vh",
+                            position: "relative"
                         },
                     }}
                     open
@@ -276,17 +327,24 @@ function MainLayout() {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 3,
-                    width: { md: `calc(100% - ${drawerWidth}px)` },
-                    minHeight: "100vh",
-                    backgroundColor: "#f5f5f5",
+                    height: "100vh",
+                    overflow: "auto",
+                    backgroundColor: "#f8f9fa",
+                    width: { md: `calc(100vw - ${drawerWidth}px)` },
+                    display: "flex",
+                    flexDirection: "column"
                 }}
             >
-                <Toolbar />
-                <Outlet />
+                <Box sx={{
+                    flex: 1,
+                    p: { xs: 2, md: 3 },
+                    height: "100%"
+                }}>
+                    <Outlet />
+                </Box>
             </Box>
         </Box>
     );
 }
 
-export default MainLayout; 
+export default MainLayout;

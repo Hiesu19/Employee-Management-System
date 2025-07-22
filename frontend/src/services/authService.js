@@ -30,6 +30,11 @@ export const changePassword = async (currentPassword, newPassword) => {
     }
 }
 
+export const logout = () => {
+    
+    clearLocalStorage();
+}
+
 // 0: Chưa đăng nhập
 // 1: Đã đăng nhập
 // 2: Cần đổi mật khẩu
@@ -52,21 +57,19 @@ export const authenticated = () => {
     }
 };
 
-
 export const getUser = () => {
     try {
         const userStr = localStorage.getItem("user");
         if (!userStr) return null;
 
         const user = JSON.parse(userStr);
-        if (!user || !user.id) return null;
         console.log("user", user);
         return user;
     } catch (e) {
         clearLocalStorage();
         return null;
     }
-}
+};
 
 export const getAccessToken = () => {
     return localStorage.getItem("accessToken");
