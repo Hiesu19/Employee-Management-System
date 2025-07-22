@@ -12,12 +12,12 @@ const ProtectedRoute = () => {
     }
 
     // 2: Cần đổi mật khẩu (2) và không phải trang /change-password → về /change-password
-    if (authStatus === 2 && location.pathname !== "/change-password") {
-        return <Navigate to="/change-password" replace />;
+    if (authStatus === 2 && location.pathname !== "/must-change-password") {
+        return <Navigate to="/must-change-password" replace />;
     }
 
     // 3: Đã đổi mật khẩu (1) và đang ở /change-password → về /
-    if (authStatus === 1 && location.pathname === "/change-password") {
+    if (authStatus === 1 && location.pathname === "/must-change-password") {
         return <Navigate to="/" replace />;
     }
 

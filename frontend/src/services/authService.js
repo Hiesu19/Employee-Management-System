@@ -13,14 +13,24 @@ export const login = async (email, password) => {
     }
 }
 
+export const refreshToken = async () => {
+    try {
+        const response = await axios.post("/auth/refresh-token", {});
+
+        if (response.data.success === "success") {
+            localStorage.setItem("accessToken", response.data.data.accessToken);
+            return response.data.data.accessToken;
+        }
+        throw new Error("Refresh token failed");
+    } catch (error) {
+        clearLocalStorage();
+        throw error;
+    }
+}
+
 export const changePassword = async (currentPassword, newPassword) => {
     try {
-        const response = await axios.post("/auth/change-password", { currentPassword, newPassword }, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("accessToken")}`
-            }
-        });
-        console.log("changePassword", response.data);
+        const response = await axios.post("/auth/change-password", { currentPassword, newPassword });
         if (response.data.success === "success") {
             return true;
         }
@@ -31,7 +41,7 @@ export const changePassword = async (currentPassword, newPassword) => {
 }
 
 export const logout = () => {
-    
+
     clearLocalStorage();
 }
 

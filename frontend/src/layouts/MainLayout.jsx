@@ -27,7 +27,7 @@ import {
     ChevronLeft as ChevronLeftIcon,
     ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
-import { getUser, clearLocalStorage } from "../services/authService";
+import { getUser, logout } from "../services/authService";
 
 const drawerWidth = 260;
 
@@ -40,7 +40,7 @@ function MainLayout() {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-    
+
     const navigate = useNavigate();
     const location = useLocation();
     const user = getUser();
@@ -57,9 +57,14 @@ function MainLayout() {
         setAnchorEl(null);
     };
 
-    const handleLogout = () => {
-        clearLocalStorage();
-        navigate("/login", { replace: true });
+    const handleLogout = async () => {
+        try {
+            await logout();
+        } catch (error) {
+            localStorage.clear();
+            navigate("/login", { replace: true });
+            window.location.reload();
+        }
         handleMenuClose();
     };
 

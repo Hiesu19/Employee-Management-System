@@ -28,7 +28,7 @@ function Login() {
 		if (authStatus === 1) {
 			navigate("/", { replace: true });
 		} else if (authStatus === 2) {
-			navigate("/change-password", { replace: true });
+			navigate("/must-change-password", { replace: true });
 		}
 	}, [navigate]);
 
@@ -47,7 +47,7 @@ function Login() {
 
 				const authStatus = authenticated();
 				if (authStatus === 2) {
-					setTimeout(() => navigate("/change-password", { replace: true }), 1000);
+					setTimeout(() => navigate("/must-change-password", { replace: true }), 1000);
 				} else if (authStatus === 1) {
 					setTimeout(() => navigate("/", { replace: true }), 1000);
 				}
