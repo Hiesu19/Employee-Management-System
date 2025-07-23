@@ -9,7 +9,7 @@ const Request = sequelize.define('Request', {
     },
     userID: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: 'users',
             key: 'userID',

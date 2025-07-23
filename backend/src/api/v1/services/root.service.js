@@ -25,8 +25,8 @@ const getEmployeeInfo = async (employeeID) => {
         avatarURL: employeeFound.avatarURL,
         createdAt: employeeFound.createdAt,
         updatedAt: employeeFound.updatedAt,
-        departmentName: employeeFound.Department.departmentName,
-        departmentID: employeeFound.Department.departmentID
+        departmentName: employeeFound.Department?.departmentName || null,
+        departmentID: employeeFound.Department?.departmentID || null
     };
 }
 
@@ -109,6 +109,9 @@ const deleteEmployee = async (employeeID) => {
     const employeeFound = await User.findOne({ where: { userID: employeeID } });
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
+    }
+    if (employeeFound.role === "root") {
+        throw new ResponseError(400, "Cannot delete root user");
     }
     await employeeFound.destroy();
 }

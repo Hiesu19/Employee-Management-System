@@ -94,7 +94,6 @@ export default function Employees() {
         fetchEmployees(1, newRowsPerPage);
     };
 
-    // đổi mật khẩu cho nhân viên đã chọn
     const handleResetPasswordForSelectedEmployees = async () => {
         const confirm = window.confirm('Bạn có chắc chắn muốn đặt lại mật khẩu cho nhân viên đã chọn?');
         if (!confirm) return;
@@ -139,9 +138,7 @@ export default function Employees() {
             if (response.success === 'success') {
                 setSuccessMessage(`Đã xóa nhân viên "${employeeName}" thành công!`);
                 setIsSuccess(true);
-                // Remove from selected if it was selected
                 setSelectedEmployees(selectedEmployees.filter(id => id !== employeeID));
-                // Refresh the list
                 fetchEmployees(page + 1, rowsPerPage);
             }
         } catch (err) {
@@ -154,10 +151,6 @@ export default function Employees() {
         setIsSuccess(false);
         setSuccessMessage('');
     }
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('vi-VN');
-    };
 
     useEffect(() => {
         fetchEmployees(1, rowsPerPage);
@@ -313,7 +306,6 @@ export default function Employees() {
                                                 </Stack>
                                             </TableCell>
                                             <TableCell>
-                                                {/* //Thêm checkbox vào đây */}
                                                 <Checkbox
                                                     size="small"
                                                     checked={selectedEmployees.includes(employee.userID)}
