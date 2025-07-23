@@ -3,7 +3,16 @@ const { ResponseError } = require('../error/ResponseError.error');
 const { Op } = require('sequelize');
 
 const getEmployeeInfo = async (employeeID) => {
-    const employeeFound = await User.findOne({ where: { userID: employeeID } });
+    const employeeFound = await User.findOne({
+        where: { userID: employeeID },
+        attributes: {
+            exclude: ['password']
+        },
+        include: [{
+            model: Department,
+            attributes: ['departmentName', 'departmentID']
+        }]
+    });
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
@@ -16,6 +25,8 @@ const getEmployeeInfo = async (employeeID) => {
         avatarURL: employeeFound.avatarURL,
         createdAt: employeeFound.createdAt,
         updatedAt: employeeFound.updatedAt,
+        departmentName: employeeFound.Department.departmentName,
+        departmentID: employeeFound.Department.departmentID
     };
 }
 
@@ -78,22 +89,21 @@ const searchEmployeeByEmailOrName = async (email, name) => {
     return employees;
 }
 
-const updateEmployeeInfo = async (employeeID, fullName, email, phone) => {
+const updateEmployeeInfo = async (employeeID, fullName, phone) => {
     const employeeFound = await User.findOne({ where: { userID: employeeID } });
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
     employeeFound.fullName = fullName || employeeFound.fullName;
-    employeeFound.email = email || employeeFound.email;
     employeeFound.phone = phone || employeeFound.phone;
     await employeeFound.save();
     return {
         userID: employeeFound.userID,
         fullName: employeeFound.fullName,
-        email: employeeFound.email,
         phone: employeeFound.phone,
     };
 }
+
 
 const deleteEmployee = async (employeeID) => {
     const employeeFound = await User.findOne({ where: { userID: employeeID } });

@@ -27,7 +27,7 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
 } from '@mui/icons-material';
-import { getAllEmployees, resetPassword } from '../../../services/employeeService';
+import { getAllEmployees, resetPassword, deleteEmployee } from '../../../services/employeeService';
 
 const getRoleColor = (role) => {
     switch (role) {
@@ -59,7 +59,8 @@ export default function Employees() {
     const [totalEmployees, setTotalEmployees] = useState(0);
 
     const [selectedEmployees, setSelectedEmployees] = useState([]);
-    const [successResetPassword, setSuccessResetPassword] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
 
     const fetchEmployees = async (pageNumber = 1, limit = 10) => {
         try {
@@ -102,7 +103,8 @@ export default function Employees() {
         const response = await resetPassword(listUserID);
         if (response.success === 'success') {
             setSelectedEmployees([]);
-            setSuccessResetPassword(true);
+            setSuccessMessage('Đặt lại mật khẩu thành công!');
+            setIsSuccess(true);
             setAnchorEl(null);
             fetchEmployees(1, rowsPerPage);
         } else {
@@ -119,7 +121,8 @@ export default function Employees() {
         const listUserID = allEmployees.data.employees.map(employee => employee.userID);
         const response = await resetPassword(listUserID);
         if (response.success === 'success') {
-            setSuccessResetPassword(true);
+            setSuccessMessage('Đặt lại mật khẩu tất cả nhân viên thành công!');
+            setIsSuccess(true);
             setAnchorEl(null);
             fetchEmployees(1, rowsPerPage);
         } else {
@@ -127,8 +130,29 @@ export default function Employees() {
         }
     }
 
+    const handleDeleteEmployee = async (employeeID, employeeName) => {
+        const confirm = window.confirm(`Bạn có chắc chắn muốn xóa nhân viên "${employeeName}"?`);
+        if (!confirm) return;
+
+        try {
+            const response = await deleteEmployee(employeeID);
+            if (response.success === 'success') {
+                setSuccessMessage(`Đã xóa nhân viên "${employeeName}" thành công!`);
+                setIsSuccess(true);
+                // Remove from selected if it was selected
+                setSelectedEmployees(selectedEmployees.filter(id => id !== employeeID));
+                // Refresh the list
+                fetchEmployees(page + 1, rowsPerPage);
+            }
+        } catch (err) {
+            console.error('Error deleting employee:', err);
+            setError('Không thể xóa nhân viên này');
+        }
+    };
+
     const handleCloseSuccessSnackbar = () => {
-        setSuccessResetPassword(false);
+        setIsSuccess(false);
+        setSuccessMessage('');
     }
 
     const formatDate = (dateString) => {
@@ -274,6 +298,7 @@ export default function Employees() {
                                                         size="small"
                                                         color="primary"
                                                         title="Chỉnh sửa"
+                                                        onClick={() => navigate(`/root/employees/edit/${employee.userID}`)}
                                                     >
                                                         <EditIcon />
                                                     </IconButton>
@@ -281,6 +306,7 @@ export default function Employees() {
                                                         size="small"
                                                         color="error"
                                                         title="Xóa"
+                                                        onClick={() => handleDeleteEmployee(employee.userID, employee.fullName)}
                                                     >
                                                         <DeleteIcon />
                                                     </IconButton>
@@ -332,10 +358,10 @@ export default function Employees() {
 
             {/* Success Snackbar */}
             <Snackbar
-                open={successResetPassword}
+                open={isSuccess}
                 autoHideDuration={4000}
                 onClose={handleCloseSuccessSnackbar}
-                message="Đặt lại mật khẩu thành công!"
+                message={successMessage || "Thao tác thành công!"}
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                 sx={{
                     '& .MuiSnackbarContent-root': {
