@@ -46,7 +46,7 @@ const createRequest = async (user, request) => {
                     "htmlBody": html
                 });
             }
-            if (process.env.NODE_ENV === "dev") {
+            if (process.env.MODE === "dev") {
                 sendEmailHTML(data, "html-dev");
             } else {
                 sendEmailHTML(data, "html");
@@ -67,7 +67,7 @@ const createRequest = async (user, request) => {
                     "htmlBody": html
                 });
             }
-            if (process.env.NODE_ENV === "dev") {
+            if (process.env.MODE === "dev") {
                 sendEmailHTML(data, "html-dev");
             } else {
                 sendEmailHTML(data, "html");

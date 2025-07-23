@@ -29,7 +29,7 @@ const resetPassword = async (employeeIDArray) => {
         emailArraySuccess.push({ "email": employeeFound.email, "password": newPassword });
     }
 
-    if (process.env.NODE_ENV === "dev") {
+    if (process.env.MODE=== "dev") {
         sendEmail(emailArraySuccess, "reset-password-dev");
     } else {
         sendEmail(emailArraySuccess, "reset-password");
