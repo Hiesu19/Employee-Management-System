@@ -300,9 +300,9 @@ export default function EditEmployee() {
             )}
 
             <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-                <Grid container spacing={5} alignItems="flex-start">
+                <Grid container spacing={5} alignItems="flex-start" justifyContent="space-between">
 
-                    <Grid item xs={12} md={8}>
+                    <Grid item xs={12} md={8} >
                         <form onSubmit={handleSubmitInfo}>
                             <Stack spacing={3}>
                                 <Box>
@@ -386,15 +386,6 @@ export default function EditEmployee() {
                                     </Select>
                                 </FormControl>
 
-                                {/* <Alert severity="info">
-                                    <Typography variant="body2">
-                                        <strong>Thông tin:</strong><br />
-                                        • Vai trò: <strong>{employee.role}</strong><br />
-                                        • Tạo lúc: {new Date(employee.createdAt).toLocaleDateString('vi-VN')}<br />
-                                        • Cập nhật: {new Date(employee.updatedAt).toLocaleDateString('vi-VN')}
-                                    </Typography>
-                                </Alert> */}
-
                                 <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2 }}>
                                     <Button
                                         type="submit"
@@ -409,8 +400,8 @@ export default function EditEmployee() {
                         </form>
                     </Grid>
 
-                    {/* Cột phải: Avatar */}
-                    <Grid item xs={12} md={4}>
+
+                    <Grid item xs={12} md={4} >
                         <Card
                             elevation={1}
                             sx={{
@@ -488,6 +479,20 @@ export default function EditEmployee() {
                             </Typography>
                         </Card>
                     </Grid>
+                </Grid>
+                <Grid item xs={12} sx={{ mt: 3 }}>
+                    <Alert severity="info">
+                        <Typography variant="body2">
+                            <strong>Lưu ý:</strong>
+                            <br />
+                            • Phòng ban có thể để trống
+                            <br />
+                            • Vai trò có thể đổi sau khi tạo
+                            <br />
+                            • Khi chuyển phòng ban mới, tự động sẽ về vai trò nhân viên
+
+                        </Typography>
+                    </Alert>
                 </Grid>
             </Paper>
         </Box>

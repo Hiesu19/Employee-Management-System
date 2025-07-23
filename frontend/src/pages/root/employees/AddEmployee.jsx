@@ -160,28 +160,9 @@ export default function AddEmployee() {
                             />
                         </Grid>
 
-                        <Grid item xs={12}>
-                            <Alert severity="info">
-                                <Typography variant="body2">
-                                    <strong>Lưu ý:</strong>
-                                    <br />
-                                    • Mật khẩu sẽ được tạo tự động và gửi qua email
-                                    • Nhân viên sẽ phải đổi mật khẩu khi đăng nhập lần đầu
-                                    • Vai trò mặc định là "Nhân viên"
-                                    • Có thể phân phòng ban sau khi tạo
-                                </Typography>
-                            </Alert>
-                        </Grid>
 
                         <Grid item xs={12}>
                             <Stack direction="row" spacing={2} justifyContent="flex-end">
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => navigate('/root/employees')}
-                                    disabled={loading}
-                                >
-                                    Hủy
-                                </Button>
                                 <Button
                                     type="submit"
                                     variant="contained"
@@ -194,6 +175,22 @@ export default function AddEmployee() {
                         </Grid>
                     </Grid>
                 </form>
+                <Grid item xs={12} sx={{ mt: 3 }}>
+                    <Alert severity="info">
+                        <Typography variant="body2">
+                            <strong>Lưu ý:</strong>
+                            <br />
+                            • Mật khẩu sẽ được tạo tự động và gửi qua email
+                            <br />
+                            • Nhân viên sẽ phải đổi mật khẩu khi đăng nhập lần đầu
+                            <br />
+                            • Vai trò mặc định là "Nhân viên"
+                            <br />
+                            • Có thể phân phòng ban sau khi tạo
+
+                        </Typography>
+                    </Alert>
+                </Grid>
             </Paper>
         </Box>
     );

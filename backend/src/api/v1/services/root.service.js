@@ -94,6 +94,9 @@ const updateEmployeeInfo = async (employeeID, fullName, phone) => {
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
+    if (employeeFound.role === "root") {
+        throw new ResponseError(400, "Cannot update root user");
+    }
     employeeFound.fullName = fullName || employeeFound.fullName;
     employeeFound.phone = phone || employeeFound.phone;
     await employeeFound.save();
@@ -119,6 +122,9 @@ const deleteEmployee = async (employeeID) => {
 const changeDepartment = async (employeeID, departmentID, isKick) => {
     if (isKick === "true") {
         const employeeFound = await User.findOne({ where: { userID: employeeID } });
+        if (employeeFound.role === "root") {
+            throw new ResponseError(400, "Cannot change department of root user");
+        }
         if (!employeeFound) {
             throw new ResponseError(404, "Employee not found");
         }
@@ -128,6 +134,9 @@ const changeDepartment = async (employeeID, departmentID, isKick) => {
         const employeeFound = await User.findOne({ where: { userID: employeeID } });
         if (!employeeFound) {
             throw new ResponseError(404, "Employee not found");
+        }
+        if (employeeFound.role === "root") {
+            throw new ResponseError(400, "Cannot change department of root user");
         }
 
         const departmentFound = await Department.findOne({ where: { departmentID: departmentID } });
@@ -157,6 +166,9 @@ const changeRole = async (employeeID, role) => {
     var departmentName = null;
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
+    }
+    if (employeeFound.role === "root") {
+        throw new ResponseError(400, "Cannot change role of root user");
     }
     if (role !== "root" && role !== "manager" && role !== "employee") {
         throw new ResponseError(400, "Role is not valid");
