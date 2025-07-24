@@ -19,9 +19,20 @@ class DepartmentController {
     // Có phân trang
     async getDepartments(req, res, next) {
         try {
-            const { page = 0, limit = 0 } = req.query;
-            const departments = await departmentService.getDepartments(page, limit);
+            const { page = 0, limit = 0, all = false } = req.query;
+            const departments = await departmentService.getDepartments(page, limit, all);
             successResponse(res, departments, "Get departments successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getDepartmentDetails(req, res, next) {
+        try {
+            const { departmentID } = req.params;
+            const { page = 1, limit = 10 } = req.query;
+            const departmentDetails = await departmentService.getDepartmentDetails(departmentID, page, limit);
+            successResponse(res, departmentDetails, "Get department details successfully");
         } catch (error) {
             next(error);
         }

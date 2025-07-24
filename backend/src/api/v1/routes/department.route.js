@@ -7,6 +7,7 @@ const { verifyToken, verifyTokenAndCheckRole } = require('../middleware/verify-t
 
 router.post('/add-department', verifyTokenAndCheckRole(['root']), DepartmentController.createDepartment);
 router.get('/', verifyTokenAndCheckRole(['root']), DepartmentController.getDepartments);
+router.get('/:departmentID', verifyTokenAndCheckRole(['root']), DepartmentController.getDepartmentDetails);
 router.put('/:departmentID', verifyTokenAndCheckRole(['root']), DepartmentController.updateDepartmentInfo);
 router.delete('/:departmentID', verifyTokenAndCheckRole(['root']), DepartmentController.deleteDepartment);
 

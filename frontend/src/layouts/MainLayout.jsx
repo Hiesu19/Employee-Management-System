@@ -35,7 +35,7 @@ const menuConfig = {
     root: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
         { text: "Quản lý nhân viên", icon: DashboardIcon, path: "/root/employees" },
-        { text: "Báo cáo", icon: SettingsIcon, path: "/root/reports" },
+        { text: "Quản lý phòng ban", icon: SettingsIcon, path: "/root/department" },
     ],
     manager: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },

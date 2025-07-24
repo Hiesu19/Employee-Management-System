@@ -13,6 +13,8 @@ import MainLayout from "../layouts/MainLayout";
 import Employees from "../pages/root/employees";
 import AddEmployee from "../pages/root/employees/AddEmployee";
 import EditEmployee from "../pages/root/employees/EditEmployee";
+import Department from "../pages/root/department";
+import DepartmentDetail from "../pages/root/department/DepartmentDetail";
 
 export default function AppRoutes() {
   return (
@@ -32,6 +34,9 @@ export default function AppRoutes() {
             <Route path="/root/employees" element={<Employees />} />
             <Route path="/root/employees/add" element={<AddEmployee />} />
             <Route path="/root/employees/edit/:employeeID" element={<EditEmployee />} />
+
+            <Route path="/root/department" element={<Department />} />
+            <Route path="/root/department/:departmentID" element={<DepartmentDetail />} />
           </Route>
         </Route>
       </Route>

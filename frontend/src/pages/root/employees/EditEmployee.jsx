@@ -33,7 +33,7 @@ import {
     kickEmployee,
     changeRole
 } from '../../../services/employeeService';
-import { getAllDepartments } from '../../../services/departmentService';
+import { getDepartments } from '../../../services/departmentService';
 import { validateFullName, validatePhone } from '../../../utils/validation';
 
 export default function EditEmployee() {
@@ -72,7 +72,7 @@ export default function EditEmployee() {
 
                 const [employee, departments] = await Promise.all([
                     getEmployeeById(employeeID),
-                    getAllDepartments()
+                    getDepartments(0, 0, "true")
                 ]);
 
                 if (employee.success === 'success') {
