@@ -26,3 +26,12 @@ export const createDepartment = async (departmentData) => {
         throw error;
     }
 };
+
+export const deleteDepartment = async (departmentID) => {
+    try {
+        const response = await axios.delete(`/departments/${departmentID}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

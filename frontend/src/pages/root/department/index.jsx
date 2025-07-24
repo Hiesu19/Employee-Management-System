@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDepartments, createDepartment } from "../../../services/departmentService";
+import { getDepartments, createDepartment, deleteDepartment } from "../../../services/departmentService";
 import {
     Table,
     TableBody,
@@ -97,8 +97,30 @@ function Department() {
         navigate(`/root/department/${departmentID}`);
     };
 
-    const handleDelete = (departmentID) => {
-        console.log("Delete clicked for department:", departmentID);
+    const handleDelete = async (departmentID) => {
+        try {
+            if (window.confirm("Bạn có chắc chắn muốn xóa phòng ban này không?")) {
+                await deleteDepartment(departmentID);
+                await fetchDepartments(page, rowsPerPage);
+            }
+            setMessage({
+                type: "success",
+                message: `Phòng ban đã được xóa thành công!`
+            });
+
+            setTimeout(() => {
+                clearMessage();
+            }, 5000);
+
+        } catch (err) {
+            console.error('Error deleting department:', err);
+            setMessage({
+                type: "error",
+                message: err.response?.data?.message || 'Không thể xóa phòng ban'
+            });
+        } finally {
+            
+        }
     };
 
     const handleOpenDialog = () => {
