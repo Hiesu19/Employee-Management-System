@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { getDepartments } from "../../../services/departmentService";
+import { getDepartments, createDepartment } from "../../../services/departmentService";
 import {
     Table,
     TableBody,
@@ -16,10 +16,18 @@ import {
     TablePagination,
     CircularProgress,
     Alert,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
 } from "@mui/material";
 import {
     Info as InfoIcon,
     Delete as DeleteIcon,
+    Add as AddIcon,
+    Close as CloseIcon,
 } from "@mui/icons-material";
 
 function Department() {
@@ -27,15 +35,28 @@ function Department() {
     const [departments, setDepartments] = useState([]);
     const [totalDepartments, setTotalDepartments] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
+    const [message, setMessage] = useState({
+        type: "",
+        message: "",
+    });
+
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [departmentName, setDepartmentName] = useState("");
+    const [description, setDescription] = useState("");
+    const [submitLoading, setSubmitLoading] = useState(false);
+
+    const clearMessage = () => {
+        setMessage({ type: "", message: "" });
+    };
+
     const fetchDepartments = useCallback(async (pageNumber, limit) => {
         try {
             setLoading(true);
-            setError(null);
+            clearMessage();
 
             const response = await getDepartments(pageNumber + 1, limit, false);
 
@@ -51,7 +72,10 @@ function Department() {
             }
         } catch (err) {
             console.error('Error fetching departments:', err);
-            setError('Không thể tải danh sách phòng ban');
+            setMessage({
+                type: "error",
+                message: "Không thể tải danh sách phòng ban"
+            });
             setDepartments([]);
             setTotalDepartments(0);
         } finally {
@@ -77,6 +101,59 @@ function Department() {
         console.log("Delete clicked for department:", departmentID);
     };
 
+    const handleOpenDialog = () => {
+        setDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+        setDepartmentName("");
+        setDescription("");
+        setSubmitLoading(false);
+    };
+
+    const handleSubmit = async () => {
+        if (!departmentName.trim()) {
+            setMessage({
+                type: "error",
+                message: "Tên phòng ban không được để trống"
+            });
+            return;
+        }
+
+        try {
+            setSubmitLoading(true);
+
+            await createDepartment({
+                departmentName: departmentName.trim(),
+                description: description.trim() || null
+            });
+
+            await fetchDepartments(page, rowsPerPage);
+
+            setMessage({
+                type: "success",
+                message: `Phòng ban "${departmentName.trim()}" đã được tạo thành công!`
+            });
+
+            handleCloseDialog();
+
+
+            setTimeout(() => {
+                clearMessage();
+            }, 5000);
+
+        } catch (err) {
+            console.error('Error creating department:', err);
+            setMessage({
+                type: "error",
+                message: err.response?.data?.message || 'Không thể tạo phòng ban'
+            });
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
 
 
     useEffect(() => {
@@ -93,17 +170,40 @@ function Department() {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
-                Quản lý phòng ban
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h4" sx={{ fontWeight: 600 }}>
+                    Quản lý phòng ban
+                </Typography>
+                <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={handleOpenDialog}
+                    sx={{ borderRadius: 2 }}
+                >
+                    Thêm phòng ban
+                </Button>
+            </Box>
 
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Tổng số phòng ban: {totalDepartments}
             </Typography>
 
-            {error && (
-                <Alert severity="error" sx={{ mb: 3 }}>
-                    {error}
+            {message.type === "error" && (
+                <Alert
+                    severity="error"
+                    sx={{ mb: 3 }}
+                    onClose={clearMessage}
+                >
+                    {message.message}
+                </Alert>
+            )}
+            {message.type === "success" && (
+                <Alert
+                    severity="success"
+                    sx={{ mb: 3 }}
+                    onClose={clearMessage}
+                >
+                    {message.message}
                 </Alert>
             )}
 
@@ -188,6 +288,89 @@ function Department() {
                     }}
                 />
             </Paper>
+
+            {/* Dialog Tạo phòng ban */}
+            <Dialog
+                open={dialogOpen}
+                onClose={handleCloseDialog}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: { borderRadius: 2 }
+                }}
+            >
+                <DialogTitle sx={{
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        Thêm phòng ban mới
+                    </Typography>
+                    <IconButton
+                        onClick={handleCloseDialog}
+                        sx={{ color: 'white' }}
+                        size="small"
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+
+                <DialogContent sx={{ p: 3 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+                        <TextField
+                            label="Tên phòng ban"
+                            value={departmentName}
+                            onChange={(e) => setDepartmentName(e.target.value)}
+                            fullWidth
+                            required
+                            error={!departmentName.trim() && submitLoading}
+                            helperText={!departmentName.trim() && submitLoading ? "Tên phòng ban không được để trống" : ""}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2
+                                }
+                            }}
+                        />
+
+                        <TextField
+                            label="Mô tả"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            fullWidth
+                            multiline
+                            rows={3}
+                            placeholder="Nhập mô tả cho phòng ban (tùy chọn)"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2
+                                }
+                            }}
+                        />
+                    </Box>
+                </DialogContent>
+
+                <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
+                    <Button
+                        onClick={handleCloseDialog}
+                        variant="outlined"
+                        disabled={submitLoading}
+                        sx={{ borderRadius: 2 }}
+                    >
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        variant="contained"
+                        disabled={submitLoading || !departmentName.trim()}
+                        sx={{ borderRadius: 2 }}
+                    >
+                        {submitLoading ? <CircularProgress size={20} /> : "Tạo phòng ban"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

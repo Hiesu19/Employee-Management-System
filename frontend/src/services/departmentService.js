@@ -17,3 +17,12 @@ export const getDepartmentDetails = async (departmentID, page = 1, limit = 10) =
         throw error;
     }
 };
+
+export const createDepartment = async (departmentData) => {
+    try {
+        const response = await axios.post("/departments/add-department", departmentData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
