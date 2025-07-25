@@ -1,4 +1,4 @@
-const { User, Department } = require('../models/index.model');
+const { User, Department, Request, CheckInOut } = require('../models/index.model');
 const { ResponseError } = require('../error/ResponseError.error');
 const { Op } = require('sequelize');
 
@@ -198,6 +198,23 @@ const changeRole = async (employeeID, role) => {
     return result;
 }
 
+const getDashboard = async () => {
+    const totalEmployees = await User.count({ where: { role: 'employee' } });
+    const totalManagers = await User.count({ where: { role: 'manager' } });
+    const countDepartment = await Department.count();
+    const totalRequestsPending = await Request.count({ where: { status: 'pending' } });
+    const countCheckInToday = await CheckInOut.count({ where: { date: new Date().toISOString().split('T')[0] } });
+    const countCheckOutToday = await CheckInOut.count({ where: { date: new Date().toISOString().split('T')[0], checkOutTime: { [Op.ne]: null } } });
+    return {
+        totalEmployees,
+        totalManagers,
+        countDepartment,
+        totalRequestsPending,
+        countCheckInToday,
+        countCheckOutToday
+    }
+}
+
 module.exports = {
     updateEmployeeInfo,
     deleteEmployee,
@@ -206,6 +223,7 @@ module.exports = {
     searchEmployeeByEmailOrName,
     deleteEmployee,
     changeDepartment,
-    changeRole
+    changeRole,
+    getDashboard
 
 };

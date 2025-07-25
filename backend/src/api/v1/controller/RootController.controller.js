@@ -98,6 +98,15 @@ class RootController {
             next(error);
         }
     }
+
+    async getDashboard(req, res, next) {
+        try {
+            const dashboard = await rootService.getDashboard();
+            successResponse(res, dashboard, "Get dashboard successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new RootController();

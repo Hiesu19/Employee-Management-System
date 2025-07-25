@@ -22,4 +22,5 @@ router.get('/request', verifyTokenAndCheckRole(['root']), RequestController.getA
 router.get('/request/total', verifyTokenAndCheckRole(['root']), RequestController.getTotalRequestByRoot);
 router.put('/request/:requestID', verifyTokenAndCheckRole(['root']), RequestController.editStatusRequestByRoot);
 
+router.get('/dashboard', verifyTokenAndCheckRole(['root']), RootController.getDashboard);
 module.exports = router
