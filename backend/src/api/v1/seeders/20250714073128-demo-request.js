@@ -15,9 +15,9 @@ module.exports = {
         fromDate: new Date("2025-07-14"),
         toDate: new Date("2025-07-15"),
         reason: "I have a personal matter to attend to",
+        reasonReject: null,
         checkedAt: null,
         checkedBy: null,
-        checkedByEmail: null,
         createdAt: now,
         updatedAt: now
       },
@@ -30,9 +30,9 @@ module.exports = {
         fromDate: new Date("2025-07-14"),
         toDate: new Date("2025-07-15"),
         reason: "I have a personal matter to attend to",
+        reasonReject: null,
         checkedAt: null,
         checkedBy: null,
-        checkedByEmail: null,
         createdAt: now,
         updatedAt: now
       },
@@ -45,9 +45,24 @@ module.exports = {
         fromDate: new Date("2025-07-14"),
         toDate: new Date("2025-07-15"),
         reason: "I have a personal matter to attend to",
+        reasonReject: null,
         checkedAt: null,
         checkedBy: null,
-        checkedByEmail: null,
+        createdAt: now,
+        updatedAt: now
+      },
+      {
+        id: "request004",
+        userID: "user106",
+        userEmail: "hieu7@example.com",
+        type: "sick",
+        status: "pending",
+        fromDate: new Date("2025-07-14"),
+        toDate: new Date("2025-07-15"),
+        reason: "I have a personal matter to attend to",
+        reasonReject: null,
+        checkedAt: null,
+        checkedBy: null,
         createdAt: now,
         updatedAt: now
       }

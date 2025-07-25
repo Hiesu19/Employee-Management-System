@@ -67,7 +67,7 @@ const sendEmailHTML = async (data, type) => {
     if (type === "html") {
         messageData = {
             "type": "html",
-            "datas": data       
+            "datas": data
         }
     } else if (type === "html-dev") {
         messageData = {
@@ -75,6 +75,7 @@ const sendEmailHTML = async (data, type) => {
             "datas": data
         }
     } else {
+        throw new Error(`Unsupported message type: ${type}`);
     }
 
     const command = new SendMessageCommand({

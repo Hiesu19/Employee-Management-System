@@ -1,5 +1,6 @@
 const rootService = require('../services/root.service');
 const resetPasswordService = require('../services/reset-password.service');
+const saveImgService = require('../services/save-img.service');
 
 const { successResponse, errorResponse } = require('../utils/response.utils');
 
@@ -38,9 +39,20 @@ class RootController {
     async updateEmployeeInfo(req, res, next) {
         try {
             const { employeeID } = req.params;
-            const { fullName, email, phone } = req.body;
-            const employee = await rootService.updateEmployeeInfo(employeeID, fullName, email, phone);
+            const { fullName, phone } = req.body;
+            const employee = await rootService.updateEmployeeInfo(employeeID, fullName, phone);
             successResponse(res, employee, "Update employee info successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateEmployeeAvatar(req, res, next) {
+        try {
+            const { employeeID } = req.params;
+            const avatar = req.file;
+            const employee = await saveImgService.updateAvatarLink(employeeID, avatar);
+            successResponse(res, employee, "Update employee avatar successfully");
         } catch (error) {
             next(error);
         }
@@ -82,6 +94,15 @@ class RootController {
             const { employeeID, role } = req.body;
             const result = await rootService.changeRole(employeeID, role);
             successResponse(res, result, `Change role successfully ${result.fullName}: ${result.oldRole} -> ${result.role}`);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getDashboard(req, res, next) {
+        try {
+            const dashboard = await rootService.getDashboard();
+            successResponse(res, dashboard, "Get dashboard successfully");
         } catch (error) {
             next(error);
         }

@@ -38,7 +38,7 @@ const createUser = async (user) => {
             createdAt: newUserResponse.createdAt,
             updatedAt: newUserResponse.updatedAt,
         }
-        if (process.env.NODE_ENV === "dev") {
+        if (process.env.MODE === "dev") {
             sendEmail([{ "email": newUserResponseWithoutPassword.email, "password": newPassword }], "new-user-dev");
             console.log("New user: " + newUserResponseWithoutPassword.email + " - Password: " + newPassword);
         } else {

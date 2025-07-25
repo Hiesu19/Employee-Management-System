@@ -11,7 +11,7 @@ module.exports = {
             },
             userID: {
                 type: Sequelize.STRING,
-                allowNull: false,
+                allowNull: true,
                 references: {
                     model: 'users',
                     key: 'userID',
@@ -43,6 +43,10 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
+            reasonReject: {
+                type: Sequelize.STRING,
+                allowNull: true,
+            },
             checkedAt: {
                 type: Sequelize.DATE,
                 allowNull: true,
@@ -56,10 +60,6 @@ module.exports = {
                 },
                 onUpdate: 'CASCADE',
                 onDelete: 'SET NULL',
-            },
-            checkedByEmail: {
-                type: Sequelize.STRING,
-                allowNull: true,
             },
             createdAt: {
                 type: Sequelize.DATE,

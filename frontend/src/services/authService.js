@@ -73,7 +73,6 @@ export const getUser = () => {
         if (!userStr) return null;
 
         const user = JSON.parse(userStr);
-        console.log("user", user);
         return user;
     } catch (e) {
         clearLocalStorage();

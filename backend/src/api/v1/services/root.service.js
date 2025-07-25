@@ -1,9 +1,18 @@
-const { User, Department } = require('../models/index.model');
+const { User, Department, Request, CheckInOut } = require('../models/index.model');
 const { ResponseError } = require('../error/ResponseError.error');
 const { Op } = require('sequelize');
 
 const getEmployeeInfo = async (employeeID) => {
-    const employeeFound = await User.findOne({ where: { userID: employeeID } });
+    const employeeFound = await User.findOne({
+        where: { userID: employeeID },
+        attributes: {
+            exclude: ['password']
+        },
+        include: [{
+            model: Department,
+            attributes: ['departmentName', 'departmentID']
+        }]
+    });
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
@@ -16,6 +25,8 @@ const getEmployeeInfo = async (employeeID) => {
         avatarURL: employeeFound.avatarURL,
         createdAt: employeeFound.createdAt,
         updatedAt: employeeFound.updatedAt,
+        departmentName: employeeFound.Department?.departmentName || null,
+        departmentID: employeeFound.Department?.departmentID || null
     };
 }
 
@@ -23,13 +34,18 @@ const getAllEmployeeInfo = async (page, limit) => {
     if (page < 0 || limit < 0) {
         throw new ResponseError(400, "Page and limit must be greater than 0");
     }
+    const totalEmployees = await User.count();
     if ((page === 0 && limit === 0) || (page === null || limit === null)) {
         const employees = await User.findAll({
             attributes: {
                 exclude: ['password']
-            }
+            },
+            include: [{
+                model: Department,
+                attributes: ['departmentName', 'departmentID']
+            }]
         });
-        return employees;
+        return { totalEmployees, employees };
     }
     const offset = (page - 1) * limit;
     const employees = await User.findAll({
@@ -37,9 +53,13 @@ const getAllEmployeeInfo = async (page, limit) => {
         limit,
         attributes: {
             exclude: ['password']
-        }
+        },
+        include: [{
+            model: Department,
+            attributes: ['departmentName', 'departmentID']
+        }]
     });
-    return employees;
+    return { totalEmployees, employees };
 }
 
 const searchEmployeeByEmailOrName = async (email, name) => {
@@ -69,27 +89,32 @@ const searchEmployeeByEmailOrName = async (email, name) => {
     return employees;
 }
 
-const updateEmployeeInfo = async (employeeID, fullName, email, phone) => {
+const updateEmployeeInfo = async (employeeID, fullName, phone) => {
     const employeeFound = await User.findOne({ where: { userID: employeeID } });
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
+    if (employeeFound.role === "root") {
+        throw new ResponseError(400, "Cannot update root user");
+    }
     employeeFound.fullName = fullName || employeeFound.fullName;
-    employeeFound.email = email || employeeFound.email;
     employeeFound.phone = phone || employeeFound.phone;
     await employeeFound.save();
     return {
         userID: employeeFound.userID,
         fullName: employeeFound.fullName,
-        email: employeeFound.email,
         phone: employeeFound.phone,
     };
 }
+
 
 const deleteEmployee = async (employeeID) => {
     const employeeFound = await User.findOne({ where: { userID: employeeID } });
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
+    }
+    if (employeeFound.role === "root") {
+        throw new ResponseError(400, "Cannot delete root user");
     }
     await employeeFound.destroy();
 }
@@ -97,6 +122,9 @@ const deleteEmployee = async (employeeID) => {
 const changeDepartment = async (employeeID, departmentID, isKick) => {
     if (isKick === "true") {
         const employeeFound = await User.findOne({ where: { userID: employeeID } });
+        if (employeeFound.role === "root") {
+            throw new ResponseError(400, "Cannot change department of root user");
+        }
         if (!employeeFound) {
             throw new ResponseError(404, "Employee not found");
         }
@@ -106,6 +134,9 @@ const changeDepartment = async (employeeID, departmentID, isKick) => {
         const employeeFound = await User.findOne({ where: { userID: employeeID } });
         if (!employeeFound) {
             throw new ResponseError(404, "Employee not found");
+        }
+        if (employeeFound.role === "root") {
+            throw new ResponseError(400, "Cannot change department of root user");
         }
 
         const departmentFound = await Department.findOne({ where: { departmentID: departmentID } });
@@ -136,6 +167,9 @@ const changeRole = async (employeeID, role) => {
     if (!employeeFound) {
         throw new ResponseError(404, "Employee not found");
     }
+    if (employeeFound.role === "root") {
+        throw new ResponseError(400, "Cannot change role of root user");
+    }
     if (role !== "root" && role !== "manager" && role !== "employee") {
         throw new ResponseError(400, "Role is not valid");
     }
@@ -164,6 +198,23 @@ const changeRole = async (employeeID, role) => {
     return result;
 }
 
+const getDashboard = async () => {
+    const totalEmployees = await User.count({ where: { role: 'employee' } });
+    const totalManagers = await User.count({ where: { role: 'manager' } });
+    const countDepartment = await Department.count();
+    const totalRequestsPending = await Request.count({ where: { status: 'pending' } });
+    const countCheckInToday = await CheckInOut.count({ where: { date: new Date().toISOString().split('T')[0] } });
+    const countCheckOutToday = await CheckInOut.count({ where: { date: new Date().toISOString().split('T')[0], checkOutTime: { [Op.ne]: null } } });
+    return {
+        totalEmployees,
+        totalManagers,
+        countDepartment,
+        totalRequestsPending,
+        countCheckInToday,
+        countCheckOutToday
+    }
+}
+
 module.exports = {
     updateEmployeeInfo,
     deleteEmployee,
@@ -172,6 +223,7 @@ module.exports = {
     searchEmployeeByEmailOrName,
     deleteEmployee,
     changeDepartment,
-    changeRole
+    changeRole,
+    getDashboard
 
 };
