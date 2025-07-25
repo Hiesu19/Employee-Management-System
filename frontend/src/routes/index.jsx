@@ -15,6 +15,7 @@ import AddEmployee from "../pages/root/employees/AddEmployee";
 import EditEmployee from "../pages/root/employees/EditEmployee";
 import Department from "../pages/root/department";
 import DepartmentDetail from "../pages/root/department/DepartmentDetail";
+import Request from "../pages/root/request";
 
 export default function AppRoutes() {
   return (
@@ -37,6 +38,8 @@ export default function AppRoutes() {
 
             <Route path="/root/department" element={<Department />} />
             <Route path="/root/department/:departmentID" element={<DepartmentDetail />} />
+
+            <Route path="/root/request" element={<Request />} />
           </Route>
         </Route>
       </Route>

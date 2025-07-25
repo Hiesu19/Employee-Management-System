@@ -15,10 +15,10 @@ const genRequestHTML = (user, request) => {
 const genRequestHTMLRequestRejected = (formData) => {
     const html = `
     <h1>Hi ${formData.fullName} - ${formData.email}</h1>
-    <h1 style="color: red;">Yêu cầu của bạn đã bị từ chối</h1>
+    <h1 style="color: red;">Yêu cầu ${formData.id} của bạn đã bị từ chối</h1>
     <p>Họ tên: ${formData.fullName}</p>
     <p>ID yêu cầu: ${formData.id}</p>
-    <p>Tên yêu cầu: ${formData.type}</p>
+    <p>Loại yêu cầu: ${formData.type}</p>
     <p>Ngày: ${convertToDDMMYYYY_HHMMSS_GMT7(formData.fromDate)} - ${convertToDDMMYYYY_HHMMSS_GMT7(formData.toDate)}</p>
     <p>Chỉnh sửa bởi: ${formData.checkedByName} - ${formData.checkedByEmail}</p>
     <p>Lý do: ${formData.reasonReject || "Không có lý do"}</p>
@@ -30,10 +30,10 @@ const genRequestHTMLRequestRejected = (formData) => {
 const genRequestHTMLRequestApproved = (formData) => {
     const html = `
     <h1>Hi ${formData.fullName} - ${formData.email}</h1>
-    <h1 style="color: green;">Yêu cầu của bạn đã được phê duyệt</h1>
+    <h1 style="color: green;">Yêu cầu ${formData.id} của bạn đã được phê duyệt</h1> 
     <p>Họ tên: ${formData.fullName}</p>
     <p>ID yêu cầu: ${formData.id}</p>
-    <p>Tên yêu cầu: ${formData.type}</p>
+    <p>Loại yêu cầu: ${formData.type}</p>
     <p>Ngày: ${convertToDDMMYYYY_HHMMSS_GMT7(formData.fromDate)} - ${convertToDDMMYYYY_HHMMSS_GMT7(formData.toDate)}</p>
     <p>Chỉnh sửa bởi: ${formData.checkedByName} - ${formData.checkedByEmail}</p>
     <p> Vui lòng truy cập hệ thống để xem chi tiết yêu cầu.</p>

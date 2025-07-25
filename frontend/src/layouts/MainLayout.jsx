@@ -26,6 +26,7 @@ import {
     ChevronRight as ChevronRightIcon,
     ChevronLeft as ChevronLeftIcon,
     ExpandMore as ExpandMoreIcon,
+    RequestPage as RequestPageIcon,
 } from "@mui/icons-material";
 import { getUser, logout } from "../services/authService";
 
@@ -36,6 +37,7 @@ const menuConfig = {
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
         { text: "Quản lý nhân viên", icon: DashboardIcon, path: "/root/employees" },
         { text: "Quản lý phòng ban", icon: SettingsIcon, path: "/root/department" },
+        { text: "Quản lý yêu cầu", icon: RequestPageIcon, path: "/root/request" },
     ],
     manager: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },

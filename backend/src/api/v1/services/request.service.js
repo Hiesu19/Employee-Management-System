@@ -263,7 +263,7 @@ const editStatusRequestByRoot = async (requestID, user, status, reasonReject = n
         fullName: userFound.fullName,
         email: userFound.email,
         id: request.id,
-        type: request.type,
+        type: request.type === "sick" ? "Nghỉ ốm" : request.type === "personal" ? "Nghỉ phép" : "Khác",
         fromDate: request.fromDate,
         toDate: request.toDate,
         checkedByName: me.fullName,
@@ -274,7 +274,7 @@ const editStatusRequestByRoot = async (requestID, user, status, reasonReject = n
         const html = genRequestHTMLRequestRejected(formData);
         const data = [{
             "toMail": userFound.email,
-            "subject": "Yêu cầu <`" + request.type + "`> của bạn đã bị từ chối",
+            "subject": "[Hiesu Co.] Yêu cầu " + request.id + " của bạn đã bị từ chối",
             "htmlBody": html
         }];
 
@@ -288,7 +288,7 @@ const editStatusRequestByRoot = async (requestID, user, status, reasonReject = n
         const html = genRequestHTMLRequestApproved(formData);
         const data = [{
             "toMail": userFound.email,
-            "subject": "Yêu cầu <`" + request.type + "`> của bạn đã được phê duyệt",
+            "subject": "[Hiesu Co.] Yêu cầu " + request.id + " của bạn đã được phê duyệt",
             "htmlBody": html
         }];
 
