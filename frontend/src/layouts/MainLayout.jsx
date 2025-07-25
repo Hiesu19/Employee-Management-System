@@ -27,7 +27,7 @@ import {
     ChevronLeft as ChevronLeftIcon,
     ExpandMore as ExpandMoreIcon,
     RequestPage as RequestPageIcon,
-    Assessment as ReportIcon, 
+    Assessment as ReportIcon,
 } from "@mui/icons-material";
 import { getUser, logout } from "../services/authService";
 
@@ -39,16 +39,14 @@ const menuConfig = {
         { text: "Quản lý nhân viên", icon: DashboardIcon, path: "/root/employees" },
         { text: "Quản lý phòng ban", icon: SettingsIcon, path: "/root/department" },
         { text: "Quản lý yêu cầu", icon: RequestPageIcon, path: "/root/request" },
-        { text: "Báo cáo", icon: ReportIcon, path: "/root/report" }, 
+        { text: "Báo cáo", icon: ReportIcon, path: "/root/report" },
     ],
     manager: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
-        { text: "Chấm công", icon: DashboardIcon, path: "/manager/checkin" },
         { text: "Thông tin cá nhân", icon: PersonIcon, path: "/manager/profile" },
     ],
     employee: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
-        { text: "Chấm công", icon: DashboardIcon, path: "/employee/checkin" },
         { text: "Thông tin cá nhân", icon: PersonIcon, path: "/employee/profile" },
     ],
 };

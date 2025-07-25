@@ -4,6 +4,7 @@ import Login from "../pages/auth/Login";
 import MustChangePassword from "../pages/auth/MustChangePassword";
 import NotFound from "../pages/error/NotFound";
 import Unauthorized from "../pages/error/Unauthorized";
+import Home from "../pages/home";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import RequireRole from "../components/RequireRole";
@@ -15,8 +16,9 @@ import EditEmployee from "../pages/root/employees/EditEmployee";
 import Department from "../pages/root/department";
 import DepartmentDetail from "../pages/root/department/DepartmentDetail";
 import Request from "../pages/root/request";
-import RootHome from "../pages/root/home";
 import Report from "../pages/root/report";
+
+
 
 export default function AppRoutes() {
   return (
@@ -30,9 +32,10 @@ export default function AppRoutes() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+
 
           <Route element={<RequireRole allowedRoles={["root"]} />}>
-            <Route path="/" element={<RootHome />} />
             <Route path="/root/employees" element={<Employees />} />
             <Route path="/root/employees/add" element={<AddEmployee />} />
             <Route path="/root/employees/edit/:employeeID" element={<EditEmployee />} />
@@ -43,6 +46,7 @@ export default function AppRoutes() {
             <Route path="/root/request" element={<Request />} />
             <Route path="/root/report" element={<Report />} />
           </Route>
+
         </Route>
       </Route>
 

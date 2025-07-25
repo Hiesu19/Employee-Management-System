@@ -98,7 +98,7 @@ const getMyCheckInOut = async (userID, offset, limit, dateStart, dateEnd) => {
     }
 
     const checkInOutFound = await CheckInOut.findAll({
-        where: { userID: userID, checkOutTime: { [Op.not]: null }, date: { [Op.between]: [dateStart, dateEnd] } },
+        where: { userID: userID, date: { [Op.between]: [dateStart, dateEnd] } },
         offset: offset,
         limit: limit,
         order: [['date', 'DESC']],
@@ -112,7 +112,7 @@ const getMyCheckInOut = async (userID, offset, limit, dateStart, dateEnd) => {
         const plainRecord = record.toJSON();
         const checkInTime = new Date(`1970-01-01T${plainRecord.checkInTime}`);
         const checkOutTime = new Date(`1970-01-01T${plainRecord.checkOutTime}`);
-        const timeWork = (checkOutTime.getTime() - checkInTime.getTime()) / 1000;
+        const timeWork = (checkOutTime.getTime() - checkInTime.getTime()) / 1000 || 0;
         totalTimeWork += timeWork;
         return { ...plainRecord, timeWork };
     });
