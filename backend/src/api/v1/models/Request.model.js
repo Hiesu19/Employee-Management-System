@@ -40,6 +40,10 @@ const Request = sequelize.define('Request', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    reasonReject: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     checkedAt: {
         type: DataTypes.DATE,
         allowNull: true,
@@ -52,11 +56,7 @@ const Request = sequelize.define('Request', {
             key: 'userID',
         },
         onDelete: 'SET NULL',
-    },
-    checkedByEmail: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
+    }
 }, {
     tableName: 'requests',
     timestamps: true,

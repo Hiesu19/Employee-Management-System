@@ -4,7 +4,7 @@ const { ResponseError } = require('../error/ResponseError.error');
 const { v4: uuidv4 } = require('uuid');
 const { Op } = require('sequelize');
 const { sendEmailHTML } = require('../utils/send-email.utils');
-const { genRequestHTML } = require('../utils/gen-requestHTML.utils');
+const { genRequestHTML, genRequestHTMLRequestRejected, genRequestHTMLRequestApproved } = require('../utils/gen-requestHTML.utils');
 
 const createRequest = async (user, request) => {
     checkTimeFromDateBeforeToDate(request.fromDate, request.toDate);
@@ -155,6 +155,10 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
         limit = 10;
     }
 
+    const count = await Request.count({
+        where: { createdAt: { [Op.between]: [dateStart, dateEnd] } }
+    });
+
     if (!status || status === null) {
         const requests = await Request.findAll({
             where: { createdAt: { [Op.between]: [dateStart, dateEnd] } },
@@ -162,7 +166,7 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
             limit: limit,
             order: [['createdAt', 'DESC']]
         });
-        return requests;
+        return { requests, count };
     } else {
         const requests = await Request.findAll({
             where: { createdAt: { [Op.between]: [dateStart, dateEnd] }, status: status },
@@ -170,7 +174,7 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
             limit: limit,
             order: [['createdAt', 'DESC']]
         });
-        return requests;
+        return { requests, count };
     }
 }
 
@@ -217,7 +221,8 @@ const getAllRequestByManager = async (managerID, offset, limit, dateStart, dateE
     return requests;
 }
 
-const editStatusRequestByRoot = async (requestID, user, status) => {
+const editStatusRequestByRoot = async (requestID, user, status, reasonReject = null) => {
+    // Kiểm tra request
     const request = await Request.findOne({ where: { id: requestID } });
     if (!request) {
         throw new ResponseError(404, "Request not found");
@@ -225,18 +230,66 @@ const editStatusRequestByRoot = async (requestID, user, status) => {
     if (request.status !== 'pending') {
         throw new ResponseError(400, "Request is not pending");
     }
+    if (status === 'rejected') {
+        if (!reasonReject) {
+            throw new ResponseError(400, "Reason is required");
+        }
+    }
+    if (status === 'approved') {
+        if (reasonReject) {
+            reasonReject = null;
+        }
+    }
+
     request.status = status;
     request.checkedAt = new Date();
     request.checkedBy = user.id;
-    request.checkedByEmail = user.email;
+    request.reasonReject = reasonReject || request.reasonReject;
 
     // Gui email
-    const userFind = await User.findOne({
-        where: { userID: request.userID },
-        attributes: ['email']
-    });
-    const mailTo = user?.email;
+    const me = await User.findOne({ where: { userID: user.id }, attributes: ['fullName', 'email'] });
 
+    const userFound = await User.findOne({ where: { userID: request.userID }, attributes: ['fullName', 'email'] });
+
+    const formData = {
+        fullName: userFound.fullName,
+        email: userFound.email,
+        id: request.id,
+        type: request.type,
+        fromDate: request.fromDate,
+        toDate: request.toDate,
+        checkedByName: me.fullName,
+        checkedByEmail: me.email,
+        reasonReject: reasonReject,
+    }
+    if (status === 'rejected') {
+        const html = genRequestHTMLRequestRejected(formData);
+        const data = [{
+            "toMail": userFound.email,
+            "subject": "Yêu cầu <`" + request.type + "`> của bạn đã bị từ chối",
+            "htmlBody": html
+        }];
+
+        if (process.env.MODE === "dev") {
+            sendEmailHTML(data, "html-dev");
+        } else {
+            sendEmailHTML(data, "html");
+        }
+
+    } else if (status === 'approved') {
+        const html = genRequestHTMLRequestApproved(formData);
+        const data = [{
+            "toMail": userFound.email,
+            "subject": "Yêu cầu <`" + request.type + "`> của bạn đã được phê duyệt",
+            "htmlBody": html
+        }];
+
+        if (process.env.MODE === "dev") {
+            sendEmailHTML(data, "html-dev");
+        } else {
+            sendEmailHTML(data, "html");
+        }
+    }
     await request.save();
 }
 
@@ -275,6 +328,7 @@ const editStatusRequestByManager = async (requestID, manager, status) => {
     request.checkedAt = new Date();
     request.checkedBy = manager.id;
     request.checkedByEmail = manager.email;
+
 
     // Gui email
     const mailTo = user.email;

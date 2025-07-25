@@ -67,8 +67,8 @@ class RequestController {
     async editStatusRequestByRoot(req, res, next) {
         try {
             const { requestID } = req.params;
-            const { status } = req.body;
-            const request = await requestService.editStatusRequestByRoot(requestID, req.user, status);
+            const { status, reasonReject } = req.body;
+            const request = await requestService.editStatusRequestByRoot(requestID, req.user, status, reasonReject);
             successResponse(res, request, "Edit status request successfully");
         } catch (error) {
             next(error);
