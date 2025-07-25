@@ -19,6 +19,7 @@ router.post('/employee/:employeeID/avatar', verifyTokenAndCheckRole(['root']), u
 router.delete('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootController.deleteEmployee);
 
 router.get('/request', verifyTokenAndCheckRole(['root']), RequestController.getAllRequestByRoot);
+router.get('/request/total', verifyTokenAndCheckRole(['root']), RequestController.getTotalRequestByRoot);
 router.put('/request/:requestID', verifyTokenAndCheckRole(['root']), RequestController.editStatusRequestByRoot);
 
 module.exports = router

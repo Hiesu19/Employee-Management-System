@@ -178,6 +178,14 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
     }
 }
 
+const getTotalRequestByRoot = async () => {
+    const totalPending = await Request.count({ where: { status: 'pending' } });
+    const totalApproved = await Request.count({ where: { status: 'approved' } });
+    const totalRejected = await Request.count({ where: { status: 'rejected' } });
+    const total = totalPending + totalApproved + totalRejected;
+    return { totalPending, totalApproved, totalRejected, total };
+}
+
 const getAllRequestByManager = async (managerID, offset, limit, dateStart, dateEnd, status) => {
     if (!dateStart || dateStart === null) {
         const lastYear = new Date();
@@ -343,6 +351,7 @@ module.exports = {
     updateMyRequest,
     deleteMyRequest,
     getAllRequestByRoot,
+    getTotalRequestByRoot,
     getAllRequestByManager,
     editStatusRequestByRoot,
     editStatusRequestByManager

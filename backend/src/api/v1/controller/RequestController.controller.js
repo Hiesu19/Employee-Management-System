@@ -54,6 +54,15 @@ class RequestController {
         }
     }
 
+    async getTotalRequestByRoot(req, res, next) {
+        try {
+            const total = await requestService.getTotalRequestByRoot();
+            successResponse(res, total, "Get total request by root successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getAllRequestByManager(req, res, next) {
         try {
             const { offset, limit, dateStart, dateEnd, status } = req.query;
