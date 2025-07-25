@@ -16,6 +16,7 @@ import Department from "../pages/root/department";
 import DepartmentDetail from "../pages/root/department/DepartmentDetail";
 import Request from "../pages/root/request";
 import RootHome from "../pages/root/home";
+import Report from "../pages/root/report";
 
 export default function AppRoutes() {
   return (
@@ -40,6 +41,7 @@ export default function AppRoutes() {
             <Route path="/root/department/:departmentID" element={<DepartmentDetail />} />
 
             <Route path="/root/request" element={<Request />} />
+            <Route path="/root/report" element={<Report />} />
           </Route>
         </Route>
       </Route>
