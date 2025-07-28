@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box,
     Paper,
@@ -44,33 +44,57 @@ const typeConfig = {
 
 function MyRequests() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState('');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [totalPages, setTotalPages] = useState(0);
+    const [totalCount, setTotalCount] = useState(0);
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+
+    useEffect(() => {
+        if (location.state?.message) {
+            setSuccessMessage(location.state.message);
+            window.history.replaceState({}, document.title);
+
+            const timer = setTimeout(() => {
+                setSuccessMessage('');
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [location.state]);
 
     const fetchRequests = async () => {
         setLoading(true);
         try {
             const offset = page * rowsPerPage;
-            const responseAll = await getMyRequest(offset, rowsPerPage, null, null, null, true);
+
             const response = await getMyRequest(
                 offset,
                 rowsPerPage,
                 null,
                 null,
-                statusFilter,
+                statusFilter || null
+            );
+
+            const countResponse = await getMyRequest(
+                0,
+                999999,
+                null,
+                null,
+                statusFilter || null,
                 true
             );
 
             setRequests(response.data);
-            setTotalPages(Math.ceil(responseAll.data.length / rowsPerPage));
+            setTotalCount(countResponse.data.length);
 
         } catch (error) {
             console.error('Lỗi khi tải dữ liệu yêu cầu:', error);
+            setError('Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
@@ -87,6 +111,7 @@ function MyRequests() {
 
     const clearFilter = () => {
         setStatusFilter('');
+        setPage(0);
     };
 
     const handleChangePage = (event, newPage) => {
@@ -107,6 +132,16 @@ function MyRequests() {
                         Thêm yêu cầu
                     </Button>
                 </Box>
+
+                {successMessage && (
+                    <Alert
+                        severity="success"
+                        sx={{ mt: 2, mb: 2 }}
+                        onClose={() => setSuccessMessage('')}
+                    >
+                        {successMessage}
+                    </Alert>
+                )}
 
                 <Box sx={{
                     display: 'flex',
@@ -161,14 +196,16 @@ function MyRequests() {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={10} sx={{ textAlign: 'center' }}>
+                                    <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
                                         <CircularProgress />
                                     </TableCell>
                                 </TableRow>
                             ) : requests.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={10} sx={{ textAlign: 'center' }}>
-                                        <Typography variant="body1">Không có dữ liệu</Typography>
+                                    <TableCell colSpan={8} sx={{ textAlign: 'center' }}>
+                                        <Typography variant="body1">
+                                            {statusFilter ? 'Không có yêu cầu nào với trạng thái này' : 'Không có dữ liệu'}
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -191,19 +228,18 @@ function MyRequests() {
                                                 color={statusConfig[request.status].color}
                                             />
                                         </TableCell>
-                                        <TableCell>{request.reasonReject}</TableCell>
+                                        <TableCell>{request.reasonReject || '-'}</TableCell>
                                     </TableRow>
                                 ))
                             )}
                         </TableBody>
-
                     </Table>
                 </TableContainer>
 
-                {/* Pagination */}
+                {/* Pagination - sửa logic */}
                 <TablePagination
                     component="div"
-                    count={totalPages}
+                    count={totalCount}
                     page={page}
                     onPageChange={handleChangePage}
                     rowsPerPage={rowsPerPage}
@@ -224,7 +260,6 @@ function MyRequests() {
             </Paper>
         </Box>
     );
-
 }
 
 export default MyRequests;
