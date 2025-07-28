@@ -62,7 +62,6 @@ export const getWeeklyCheckInOutStatus = async () => {
 
         const response = await getMyCheckInOut(0, 50, formatDate(startOfWeek), formatDate(endOfWeek));
 
-        // Transform data to weekly format
         const weeklyData = {};
 
         if (response.data && response.data.checkInOut) {

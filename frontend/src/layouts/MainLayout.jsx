@@ -47,6 +47,7 @@ const menuConfig = {
     ],
     employee: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/employee/checkinout" },
         { text: "Thông tin cá nhân", icon: PersonIcon, path: "/employee/profile" },
     ],
 };

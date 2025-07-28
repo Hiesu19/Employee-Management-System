@@ -4,7 +4,7 @@ import Login from "../pages/auth/Login";
 import MustChangePassword from "../pages/auth/MustChangePassword";
 import NotFound from "../pages/error/NotFound";
 import Unauthorized from "../pages/error/Unauthorized";
-import Home from "../pages/home";
+import Home from "../pages/Home";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import RequireRole from "../components/RequireRole";
@@ -17,6 +17,8 @@ import Department from "../pages/root/department";
 import DepartmentDetail from "../pages/root/department/DepartmentDetail";
 import Request from "../pages/root/request";
 import Report from "../pages/root/report";
+
+import CheckInOut from "../pages/employee/checkInOut";
 
 
 
@@ -45,6 +47,10 @@ export default function AppRoutes() {
 
             <Route path="/root/request" element={<Request />} />
             <Route path="/root/report" element={<Report />} />
+          </Route>
+
+          <Route element={<RequireRole allowedRoles={["employee", "manager"]} />}>
+            <Route path="/employee/checkinout" element={<CheckInOut />} />
           </Route>
 
         </Route>
