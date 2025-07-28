@@ -1,7 +1,7 @@
 const { Request, User } = require('../models/index.model');
 const { checkTimeFromDateBeforeToDate } = require('../validation/time.validation');
 const { ResponseError } = require('../error/ResponseError.error');
-const { v4: uuidv4 } = require('uuid');
+const { nanoid } = require('nanoid');
 const { Op } = require('sequelize');
 const { sendEmailHTML } = require('../utils/send-email.utils');
 const { genRequestHTML, genRequestHTMLRequestRejected, genRequestHTMLRequestApproved } = require('../utils/gen-requestHTML.utils');
@@ -15,7 +15,7 @@ const createRequest = async (user, request) => {
     }
 
     const newRequest = await Request.create({
-        id: uuidv4(),
+        id: nanoid(8),
         userID: user.id,
         userEmail: user.email,
         type: request.type,
@@ -77,28 +77,43 @@ const createRequest = async (user, request) => {
     return newRequest;
 }
 
-const getMyRequest = async (userID, offset, limit, dateStart, dateEnd) => {
-    if (!dateStart || dateStart === null) {
+const getMyRequest = async (userID, offset, limit, dateStart, dateEnd, status, isAll = false) => {
+    if (!userID) {
+        throw new Error("userID is required.");
+    }
+    if (!dateStart) {
         const lastYear = new Date();
         lastYear.setFullYear(lastYear.getFullYear() - 1);
         dateStart = lastYear;
     }
-    if (!dateEnd || dateEnd === null) {
+
+    if (!dateEnd) {
         dateEnd = new Date();
     }
-    if (!offset || offset === null) {
-        offset = 0;
+
+    const whereClause = {
+        userID,
+        createdAt: {
+            [Op.between]: [dateStart, dateEnd],
+        },
+    };
+
+    if (status !== null && status !== undefined) {
+        whereClause.status = status;
     }
-    if (!limit || limit === null) {
-        limit = 10;
+    const queryOptions = {
+        where: whereClause,
+        order: [['createdAt', 'DESC']],
+    };
+
+    if (!isAll) {
+        queryOptions.offset = offset;
+        queryOptions.limit = limit;
     }
-    const request = await Request.findAll({
-        where: { userID: userID, createdAt: { [Op.between]: [dateStart, dateEnd] } },
-        offset: offset,
-        limit: limit,
-        order: [['createdAt', 'DESC']]
-    });
-    return request;
+
+    const requests = await Request.findAll(queryOptions);
+
+    return requests;
 }
 
 const updateMyRequest = async (requestID, userID, newRequest) => {
