@@ -43,12 +43,16 @@ const menuConfig = {
     ],
     manager: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
-        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/manager/profile" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/me/checkinout" },
+        { text: "Yêu cầu", icon: RequestPageIcon, path: "/me/request" },
+        { text: "Quản lý phòng ban", icon: DashboardIcon, path: "/manager/department" },
+        { text: "Quản lý yêu cầu", icon: RequestPageIcon, path: "/manager/request" },
     ],
     employee: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
-        { text: "Chấm công", icon: DashboardIcon, path: "/employee/checkinout" },
-        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/employee/profile" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/me/checkinout" },
+        { text: "Yêu cầu", icon: RequestPageIcon, path: "/me/request" },
+        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/me/profile" },
     ],
 };
 

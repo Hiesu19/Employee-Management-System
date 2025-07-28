@@ -19,7 +19,8 @@ import Request from "../pages/root/request";
 import Report from "../pages/root/report";
 
 import CheckInOut from "../pages/employee/checkInOut";
-
+import MyRequests from "../pages/employee/request";
+import AddRequest from "../pages/employee/request/addRequest";
 
 
 export default function AppRoutes() {
@@ -50,7 +51,10 @@ export default function AppRoutes() {
           </Route>
 
           <Route element={<RequireRole allowedRoles={["employee", "manager"]} />}>
-            <Route path="/employee/checkinout" element={<CheckInOut />} />
+            <Route path="/me/checkinout" element={<CheckInOut />} />
+            <Route path="/me/request" element={<MyRequests />} />
+            <Route path="/me/request/add" element={<AddRequest />} />
+
           </Route>
 
         </Route>

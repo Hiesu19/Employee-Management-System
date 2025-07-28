@@ -37,3 +37,29 @@ export const getTotalRequestByRoot = async () => {
         throw error;
     }
 };
+
+export const createRequest = async (request) => {
+    try {
+        const response = await axios.post("/me/request", request);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getMyRequest = async (offset = 0, limit = 10, dateStart, dateEnd, status, isAll = false) => {
+    try {
+        const params = { offset, limit };
+        if (dateStart) params.dateStart = dateStart;
+        if (dateEnd) params.dateEnd = dateEnd;
+        if (status) params.status = status;
+        if (isAll) params.isAll = isAll;
+
+        const response = await axios.get(`/me/request`, { params });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
