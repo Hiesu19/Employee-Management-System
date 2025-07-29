@@ -373,7 +373,7 @@ const editStatusRequestByRoot = async (requestID, user, status, reasonReject = n
     await request.save();
 }
 
-const editStatusRequestByManager = async (requestID, manager, status) => {
+const editStatusRequestByManager = async (requestID, manager, status, reasonReject = null) => {
     if (status !== 'approved' && status !== 'rejected') {
         throw new ResponseError(400, "Invalid status");
     }
@@ -408,11 +408,52 @@ const editStatusRequestByManager = async (requestID, manager, status) => {
     request.checkedAt = new Date();
     request.checkedBy = manager.id;
     request.checkedByEmail = manager.email;
+    request.reasonReject = reasonReject || request.reasonReject;
 
+    const me = await User.findOne({ where: { userID: manager.id }, attributes: ['fullName', 'email'] });
+    const userFound = await User.findOne({ where: { userID: request.userID }, attributes: ['fullName', 'email'] });
 
     // Gui email
-    const mailTo = user.email;
 
+    const formData = {
+        fullName: userFound.fullName,
+        email: userFound.email,
+        id: request.id,
+        type: request.type === "sick" ? "Nghỉ ốm" : request.type === "personal" ? "Nghỉ phép" : "Khác",
+        fromDate: request.fromDate,
+        toDate: request.toDate,
+        checkedByName: me.fullName,
+        checkedByEmail: me.email,
+        reasonReject: reasonReject,
+    }
+    if (status === 'rejected') {
+        const html = genRequestHTMLRequestRejected(formData);
+        const data = [{
+            "toMail": userFound.email,
+            "subject": "[Hiesu Co.] Yêu cầu " + request.id + " của bạn đã bị từ chối",
+            "htmlBody": html
+        }];
+
+        if (process.env.MODE === "dev") {
+            sendEmailHTML(data, "html-dev");
+        } else {
+            sendEmailHTML(data, "html");
+        }
+
+    } else if (status === 'approved') {
+        const html = genRequestHTMLRequestApproved(formData);
+        const data = [{
+            "toMail": userFound.email,
+            "subject": "[Hiesu Co.] Yêu cầu " + request.id + " của bạn đã được phê duyệt",
+            "htmlBody": html
+        }];
+
+        if (process.env.MODE === "dev") {
+            sendEmailHTML(data, "html-dev");
+        } else {
+            sendEmailHTML(data, "html");
+        }
+    }
     await request.save();
 }
 

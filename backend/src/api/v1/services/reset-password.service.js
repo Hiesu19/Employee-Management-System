@@ -19,7 +19,6 @@ const resetPassword = async (employeeIDArray) => {
         const newPassword = crypto.randomBytes(8).toString("base64").replace(/[^a-zA-Z0-9]/g, '').substring(0, 9);
 
 
-        console.log("To: " + employeeFound.email + " - New password: " + newPassword);
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 

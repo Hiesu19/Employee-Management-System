@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllRequestsByManager, updateRequestStatusByRoot, getTotalRequestByManager } from '../../../services/requestService';
+import { getAllRequestsByManager, updateRequestStatusByManager, getTotalRequestByManager } from '../../../services/requestService';
 import {
     Box,
     Typography,
@@ -136,7 +136,7 @@ function RequestManager() {
 
     const handleApproveRequest = async (request) => {
         try {
-            await updateRequestStatusByRoot(request.id, 'approved');
+            await updateRequestStatusByManager(request.id, 'approved');
             setMessage({
                 type: 'success',
                 message: 'Đã phê duyệt yêu cầu thành công'
@@ -160,7 +160,7 @@ function RequestManager() {
 
     const handleConfirmStatusUpdate = async () => {
         try {
-            await updateRequestStatusByRoot(selectedRequest.id, newStatus, rejectionReason);
+            await updateRequestStatusByManager(selectedRequest.id, newStatus, rejectionReason);
             setMessage({
                 type: 'success',
                 message: newStatus === 'approved' ? 'Đã phê duyệt yêu cầu thành công' : 'Đã từ chối yêu cầu thành công'

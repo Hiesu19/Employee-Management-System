@@ -85,3 +85,18 @@ export const getAllRequestsByManager = async (offset = 0, limit = 10, dateStart 
     }
 }
 
+export const updateRequestStatusByManager = async (requestID, status, rejectionReason = null) => {
+    try {
+        const payload = { status };
+
+        if (status === 'rejected' && rejectionReason) {
+            payload.reasonReject = rejectionReason;
+        }
+
+        const response = await axios.put(`/me/manager/request/${requestID}`, payload);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+

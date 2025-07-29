@@ -58,7 +58,6 @@ const exportAllEmployeeInCompany = async (user) => {
         }]
     });
 
-    console.log(employeesInCompany)
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Nhan vien');
