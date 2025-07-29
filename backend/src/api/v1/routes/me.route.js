@@ -20,6 +20,7 @@ router.put('/request/:requestID', verifyTokenAndCheckRole(['manager', 'employee'
 router.delete('/request/:requestID', verifyTokenAndCheckRole(['manager', 'employee']), RequestController.deleteMyRequest);
 
 router.get('/manager/my-department', verifyTokenAndCheckRole(['manager']), EmployeeController.getMyDepartment);
+router.get('/manager/employee/:employeeID', verifyTokenAndCheckRole(['manager']), EmployeeController.getMyDepartmentEmployee);
 
 router.get('/manager/request', verifyTokenAndCheckRole(['manager']), RequestController.getAllRequestByManager);
 router.put('/manager/request/:requestID', verifyTokenAndCheckRole(['manager']), RequestController.editStatusRequestByManager);

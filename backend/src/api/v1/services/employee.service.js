@@ -125,6 +125,10 @@ const getMyCheckInOut = async (userID, offset, limit, dateStart, dateEnd) => {
 };
 
 const getMyDepartment = async (user, offset, limit) => {
+    const countEmployees = await User.count({
+        where: { departmentID: user.departmentID, role: { [Op.or]: ['employee'] } }
+    });
+
     const employees = await User.findAll({
         where: { departmentID: user.departmentID, role: { [Op.or]: ['employee'] } },
         attributes: { exclude: ['password'] },
@@ -149,11 +153,11 @@ const getMyDepartment = async (user, offset, limit) => {
 
         }
     });
-    return result;
+    return { count: countEmployees, result };
 }
 
 const getMyDepartmentEmployee = async (manager, employeeID) => {
-    const employee = await User.findOne({ where: { userID: employeeID } });
+    const employee = await User.findOne({ where: { userID: employeeID }, attributes: { exclude: ['password'] } });
     if (!employee) {
         throw new ResponseError(404, "Employee not found");
     }
