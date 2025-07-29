@@ -27,12 +27,27 @@ CheckInOut.belongsTo(User, {
 
 User.hasMany(Request, {
    foreignKey: 'userID',
+   as: 'createdRequests',
    onDelete: 'SET NULL',
 });
 
 Request.belongsTo(User, {
    foreignKey: 'userID',
+   as: 'creator',
    onDelete: 'SET NULL',
 });
+
+User.hasMany(Request, {
+   foreignKey: 'checkedBy',
+   as: 'checkedRequests',
+   onDelete: 'SET NULL',
+});
+
+Request.belongsTo(User, {
+   foreignKey: 'checkedBy',
+   as: 'checkedByUser',
+   onDelete: 'SET NULL',
+}
+);
 
 module.exports = { Department, User, RefreshToken, CheckInOut, Request };

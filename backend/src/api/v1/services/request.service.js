@@ -1,7 +1,7 @@
 const { Request, User } = require('../models/index.model');
 const { checkTimeFromDateBeforeToDate } = require('../validation/time.validation');
 const { ResponseError } = require('../error/ResponseError.error');
-const { v4: uuidv4 } = require('uuid');
+const { nanoid } = require('nanoid');
 const { Op } = require('sequelize');
 const { sendEmailHTML } = require('../utils/send-email.utils');
 const { genRequestHTML, genRequestHTMLRequestRejected, genRequestHTMLRequestApproved } = require('../utils/gen-requestHTML.utils');
@@ -15,7 +15,7 @@ const createRequest = async (user, request) => {
     }
 
     const newRequest = await Request.create({
-        id: uuidv4(),
+        id: nanoid(8),
         userID: user.id,
         userEmail: user.email,
         type: request.type,
@@ -77,28 +77,43 @@ const createRequest = async (user, request) => {
     return newRequest;
 }
 
-const getMyRequest = async (userID, offset, limit, dateStart, dateEnd) => {
-    if (!dateStart || dateStart === null) {
+const getMyRequest = async (userID, offset, limit, dateStart, dateEnd, status, isAll = false) => {
+    if (!userID) {
+        throw new Error("userID is required.");
+    }
+    if (!dateStart) {
         const lastYear = new Date();
         lastYear.setFullYear(lastYear.getFullYear() - 1);
         dateStart = lastYear;
     }
-    if (!dateEnd || dateEnd === null) {
+
+    if (!dateEnd) {
         dateEnd = new Date();
     }
-    if (!offset || offset === null) {
-        offset = 0;
+
+    const whereClause = {
+        userID,
+        createdAt: {
+            [Op.between]: [dateStart, dateEnd],
+        },
+    };
+
+    if (status !== null && status !== undefined) {
+        whereClause.status = status;
     }
-    if (!limit || limit === null) {
-        limit = 10;
+    const queryOptions = {
+        where: whereClause,
+        order: [['createdAt', 'DESC']],
+    };
+
+    if (!isAll) {
+        queryOptions.offset = offset;
+        queryOptions.limit = limit;
     }
-    const request = await Request.findAll({
-        where: { userID: userID, createdAt: { [Op.between]: [dateStart, dateEnd] } },
-        offset: offset,
-        limit: limit,
-        order: [['createdAt', 'DESC']]
-    });
-    return request;
+
+    const requests = await Request.findAll(queryOptions);
+
+    return requests;
 }
 
 const updateMyRequest = async (requestID, userID, newRequest) => {
@@ -162,6 +177,15 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
     if (!status || status === null) {
         const requests = await Request.findAll({
             where: { createdAt: { [Op.between]: [dateStart, dateEnd] } },
+            include: [{
+                model: User,
+                as: 'creator',
+                attributes: ['userID', 'fullName', 'email']
+            }, {
+                model: User,
+                as: 'checkedByUser',
+                attributes: ['userID', 'fullName', 'email']
+            }],
             offset: offset,
             limit: limit,
             order: [['createdAt', 'DESC']]
@@ -170,6 +194,15 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
     } else {
         const requests = await Request.findAll({
             where: { createdAt: { [Op.between]: [dateStart, dateEnd] }, status: status },
+            include: [{
+                model: User,
+                as: 'creator',
+                attributes: ['userID', 'fullName', 'email']
+            }, {
+                model: User,
+                as: 'checkedByUser',
+                attributes: ['userID', 'fullName', 'email']
+            }],
             offset: offset,
             limit: limit,
             order: [['createdAt', 'DESC']]
@@ -187,47 +220,86 @@ const getTotalRequestByRoot = async () => {
 }
 
 const getAllRequestByManager = async (managerID, offset, limit, dateStart, dateEnd, status) => {
-    if (!dateStart || dateStart === null) {
+    if (!dateStart) {
         const lastYear = new Date();
         lastYear.setFullYear(lastYear.getFullYear() - 1);
         dateStart = lastYear;
     }
-    if (!dateEnd || dateEnd === null) {
-        dateEnd = new Date();
-    }
-
-    if (!offset || offset === null) {
-        offset = 0;
-    }
-    if (!limit || limit === null) {
-        limit = 10;
-    }
+    if (!dateEnd) dateEnd = new Date();
+    if (!offset) offset = 0;
+    if (!limit) limit = 10;
 
     const manager = await User.findOne({ where: { userID: managerID } });
     if (!manager) {
         throw new ResponseError(404, "Manager not found");
     }
+
     const departmentID = manager.departmentID;
 
     const requests = await Request.findAll({
         where: {
             createdAt: { [Op.between]: [dateStart, dateEnd] },
-            ...(status ? { status: status } : {})
+            ...(status ? { status } : {})
         },
-        include: [{
-            model: User,
-            where: {
-                role: 'employee',
-                departmentID: departmentID
+        include: [
+            {
+                model: User,
+                as: 'creator',
+                where: {
+                    role: 'employee',
+                    departmentID
+                },
+                attributes: ['userID', 'fullName', 'email']
             },
-            attributes: ['userID', 'fullName', 'email']
-        }],
-        offset: offset,
-        limit: limit,
+            {
+                model: User,
+                as: 'checkedByUser',
+                attributes: ['userID', 'fullName', 'email']
+            }
+        ],
+        offset,
+        limit,
         order: [['createdAt', 'DESC']]
     });
+
     return requests;
-}
+};
+
+
+const countRequestsByStatus = async (status, departmentID) => {
+    return await Request.count({
+        where: { status },
+        include: [{
+            model: User,
+            as: 'creator',
+            where: {
+                role: 'employee',
+                departmentID
+            },
+        }]
+    });
+};
+
+const getTotalRequestByManager = async (managerID) => {
+    const manager = await User.findOne({ where: { userID: managerID } });
+    if (!manager) {
+        throw new ResponseError(404, "Manager not found");
+    }
+
+    const departmentID = manager.departmentID;
+
+    const [totalPending, totalApproved, totalRejected] = await Promise.all([
+        countRequestsByStatus('pending', departmentID),
+        countRequestsByStatus('approved', departmentID),
+        countRequestsByStatus('rejected', departmentID),
+    ]);
+
+    const total = totalPending + totalApproved + totalRejected;
+
+    return { totalPending, totalApproved, totalRejected, total };
+};
+
+
 
 const editStatusRequestByRoot = async (requestID, user, status, reasonReject = null) => {
     // Kiểm tra request
@@ -301,7 +373,7 @@ const editStatusRequestByRoot = async (requestID, user, status, reasonReject = n
     await request.save();
 }
 
-const editStatusRequestByManager = async (requestID, manager, status) => {
+const editStatusRequestByManager = async (requestID, manager, status, reasonReject = null) => {
     if (status !== 'approved' && status !== 'rejected') {
         throw new ResponseError(400, "Invalid status");
     }
@@ -336,11 +408,52 @@ const editStatusRequestByManager = async (requestID, manager, status) => {
     request.checkedAt = new Date();
     request.checkedBy = manager.id;
     request.checkedByEmail = manager.email;
+    request.reasonReject = reasonReject || request.reasonReject;
 
+    const me = await User.findOne({ where: { userID: manager.id }, attributes: ['fullName', 'email'] });
+    const userFound = await User.findOne({ where: { userID: request.userID }, attributes: ['fullName', 'email'] });
 
     // Gui email
-    const mailTo = user.email;
 
+    const formData = {
+        fullName: userFound.fullName,
+        email: userFound.email,
+        id: request.id,
+        type: request.type === "sick" ? "Nghỉ ốm" : request.type === "personal" ? "Nghỉ phép" : "Khác",
+        fromDate: request.fromDate,
+        toDate: request.toDate,
+        checkedByName: me.fullName,
+        checkedByEmail: me.email,
+        reasonReject: reasonReject,
+    }
+    if (status === 'rejected') {
+        const html = genRequestHTMLRequestRejected(formData);
+        const data = [{
+            "toMail": userFound.email,
+            "subject": "[Hiesu Co.] Yêu cầu " + request.id + " của bạn đã bị từ chối",
+            "htmlBody": html
+        }];
+
+        if (process.env.MODE === "dev") {
+            sendEmailHTML(data, "html-dev");
+        } else {
+            sendEmailHTML(data, "html");
+        }
+
+    } else if (status === 'approved') {
+        const html = genRequestHTMLRequestApproved(formData);
+        const data = [{
+            "toMail": userFound.email,
+            "subject": "[Hiesu Co.] Yêu cầu " + request.id + " của bạn đã được phê duyệt",
+            "htmlBody": html
+        }];
+
+        if (process.env.MODE === "dev") {
+            sendEmailHTML(data, "html-dev");
+        } else {
+            sendEmailHTML(data, "html");
+        }
+    }
     await request.save();
 }
 
@@ -353,6 +466,7 @@ module.exports = {
     getAllRequestByRoot,
     getTotalRequestByRoot,
     getAllRequestByManager,
+    getTotalRequestByManager,
     editStatusRequestByRoot,
     editStatusRequestByManager
 }

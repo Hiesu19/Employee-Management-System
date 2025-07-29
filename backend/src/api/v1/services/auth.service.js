@@ -40,7 +40,6 @@ const createUser = async (user) => {
         }
         if (process.env.MODE === "dev") {
             sendEmail([{ "email": newUserResponseWithoutPassword.email, "password": newPassword }], "new-user-dev");
-            console.log("New user: " + newUserResponseWithoutPassword.email + " - Password: " + newPassword);
         } else {
             sendEmail([{ "email": newUserResponseWithoutPassword.email, "password": newPassword }], "new-user");
         }

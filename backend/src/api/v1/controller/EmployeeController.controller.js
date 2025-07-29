@@ -6,8 +6,6 @@ class EmployeeController {
     async getMyInfo(req, res, next) {
         try {
             const userID = req.user.id;
-            console.log(req.user);
-            console.log(userID);
             const myInfo = await employeeService.getMyInfo(userID);
             successResponse(res, myInfo, "Get my info successfully");
         } catch (error) {

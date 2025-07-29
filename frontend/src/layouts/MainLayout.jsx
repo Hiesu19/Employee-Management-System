@@ -27,7 +27,7 @@ import {
     ChevronLeft as ChevronLeftIcon,
     ExpandMore as ExpandMoreIcon,
     RequestPage as RequestPageIcon,
-    Assessment as ReportIcon, 
+    Assessment as ReportIcon,
 } from "@mui/icons-material";
 import { getUser, logout } from "../services/authService";
 
@@ -39,17 +39,21 @@ const menuConfig = {
         { text: "Quản lý nhân viên", icon: DashboardIcon, path: "/root/employees" },
         { text: "Quản lý phòng ban", icon: SettingsIcon, path: "/root/department" },
         { text: "Quản lý yêu cầu", icon: RequestPageIcon, path: "/root/request" },
-        { text: "Báo cáo", icon: ReportIcon, path: "/root/report" }, 
+        { text: "Báo cáo", icon: ReportIcon, path: "/root/report" },
     ],
     manager: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
-        { text: "Chấm công", icon: DashboardIcon, path: "/manager/checkin" },
-        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/manager/profile" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/me/checkinout" },
+        { text: "Yêu cầu của tôi", icon: RequestPageIcon, path: "/me/request" },
+        { text: "Quản lý phòng ban", icon: DashboardIcon, path: "/manager/department" },
+        { text: "Quản lý yêu cầu", icon: RequestPageIcon, path: "/manager/request" },
+        { text: "Báo cáo", icon: ReportIcon, path: "/manager/report" },
     ],
     employee: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
-        { text: "Chấm công", icon: DashboardIcon, path: "/employee/checkin" },
-        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/employee/profile" },
+        { text: "Chấm công", icon: DashboardIcon, path: "/me/checkinout" },
+        { text: "Yêu cầu", icon: RequestPageIcon, path: "/me/request" },
+        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/me/profile" },
     ],
 };
 

@@ -13,9 +13,9 @@ class RequestController {
 
     async getMyRequest(req, res, next) {
         try {
-            const { offset, limit, dateStart, dateEnd } = req.query;
+            const { offset, limit, dateStart, dateEnd,status, isAll } = req.query;
             const userID = req.user.id;
-            const request = await requestService.getMyRequest(userID, offset, limit, dateStart, dateEnd);
+            const request = await requestService.getMyRequest(userID, offset, limit, dateStart, dateEnd, status, isAll);
             successResponse(res, request, "Get my request successfully");
         } catch (error) {
             next(error);
@@ -73,6 +73,15 @@ class RequestController {
         }
     }
 
+    async getTotalRequestByManager(req, res, next) {
+        try {
+            const total = await requestService.getTotalRequestByManager(req.user.id);
+            successResponse(res, total, "Get total request by manager successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async editStatusRequestByRoot(req, res, next) {
         try {
             const { requestID } = req.params;
@@ -87,8 +96,8 @@ class RequestController {
     async editStatusRequestByManager(req, res, next) {
         try {
             const { requestID } = req.params;
-            const { status } = req.body;
-            const request = await requestService.editStatusRequestByManager(requestID, req.user, status);
+            const { status, reasonReject } = req.body;
+            const request = await requestService.editStatusRequestByManager(requestID, req.user, status, reasonReject);
             successResponse(res, request, "Edit status request successfully");
         } catch (error) {
             next(error);

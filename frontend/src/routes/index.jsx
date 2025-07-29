@@ -4,6 +4,7 @@ import Login from "../pages/auth/Login";
 import MustChangePassword from "../pages/auth/MustChangePassword";
 import NotFound from "../pages/error/NotFound";
 import Unauthorized from "../pages/error/Unauthorized";
+import Home from "../pages/Home";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import RequireRole from "../components/RequireRole";
@@ -15,8 +16,15 @@ import EditEmployee from "../pages/root/employees/EditEmployee";
 import Department from "../pages/root/department";
 import DepartmentDetail from "../pages/root/department/DepartmentDetail";
 import Request from "../pages/root/request";
-import RootHome from "../pages/root/home";
 import Report from "../pages/root/report";
+
+import CheckInOut from "../pages/employee/checkInOut";
+import MyRequests from "../pages/employee/request";
+import AddRequest from "../pages/employee/request/addRequest";
+
+import DepartmentManager from "../pages/manager/department";
+import RequestManager from "../pages/manager/request";
+import ReportManager from "../pages/manager/report";
 
 export default function AppRoutes() {
   return (
@@ -30,9 +38,10 @@ export default function AppRoutes() {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+
 
           <Route element={<RequireRole allowedRoles={["root"]} />}>
-            <Route path="/" element={<RootHome />} />
             <Route path="/root/employees" element={<Employees />} />
             <Route path="/root/employees/add" element={<AddEmployee />} />
             <Route path="/root/employees/edit/:employeeID" element={<EditEmployee />} />
@@ -43,6 +52,20 @@ export default function AppRoutes() {
             <Route path="/root/request" element={<Request />} />
             <Route path="/root/report" element={<Report />} />
           </Route>
+
+          <Route element={<RequireRole allowedRoles={["employee", "manager"]} />}>
+            <Route path="/me/checkinout" element={<CheckInOut />} />
+            <Route path="/me/request" element={<MyRequests />} />
+            <Route path="/me/request/add" element={<AddRequest />} />
+
+          </Route>
+
+          <Route element={<RequireRole allowedRoles={["manager"]} />}>
+            <Route path="/manager/department" element={<DepartmentManager />} />
+            <Route path="/manager/request" element={<RequestManager />} />
+            <Route path="/manager/report" element={<ReportManager />} />
+          </Route>
+
         </Route>
       </Route>
 
