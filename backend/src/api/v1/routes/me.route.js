@@ -23,6 +23,7 @@ router.get('/manager/my-department', verifyTokenAndCheckRole(['manager']), Emplo
 router.get('/manager/employee/:employeeID', verifyTokenAndCheckRole(['manager']), EmployeeController.getMyDepartmentEmployee);
 
 router.get('/manager/request', verifyTokenAndCheckRole(['manager']), RequestController.getAllRequestByManager);
+router.get('/manager/request/total', verifyTokenAndCheckRole(['manager']), RequestController.getTotalRequestByManager);
 router.put('/manager/request/:requestID', verifyTokenAndCheckRole(['manager']), RequestController.editStatusRequestByManager);
 
 module.exports = router;

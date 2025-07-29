@@ -73,6 +73,15 @@ class RequestController {
         }
     }
 
+    async getTotalRequestByManager(req, res, next) {
+        try {
+            const total = await requestService.getTotalRequestByManager(req.user.id);
+            successResponse(res, total, "Get total request by manager successfully");
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async editStatusRequestByRoot(req, res, next) {
         try {
             const { requestID } = req.params;

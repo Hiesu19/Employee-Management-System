@@ -177,6 +177,15 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
     if (!status || status === null) {
         const requests = await Request.findAll({
             where: { createdAt: { [Op.between]: [dateStart, dateEnd] } },
+            include: [{
+                model: User,
+                as: 'creator',
+                attributes: ['userID', 'fullName', 'email']
+            }, {
+                model: User,
+                as: 'checkedByUser',
+                attributes: ['userID', 'fullName', 'email']
+            }],
             offset: offset,
             limit: limit,
             order: [['createdAt', 'DESC']]
@@ -185,6 +194,15 @@ const getAllRequestByRoot = async (offset, limit, dateStart, dateEnd, status) =>
     } else {
         const requests = await Request.findAll({
             where: { createdAt: { [Op.between]: [dateStart, dateEnd] }, status: status },
+            include: [{
+                model: User,
+                as: 'creator',
+                attributes: ['userID', 'fullName', 'email']
+            }, {
+                model: User,
+                as: 'checkedByUser',
+                attributes: ['userID', 'fullName', 'email']
+            }],
             offset: offset,
             limit: limit,
             order: [['createdAt', 'DESC']]
@@ -202,47 +220,86 @@ const getTotalRequestByRoot = async () => {
 }
 
 const getAllRequestByManager = async (managerID, offset, limit, dateStart, dateEnd, status) => {
-    if (!dateStart || dateStart === null) {
+    if (!dateStart) {
         const lastYear = new Date();
         lastYear.setFullYear(lastYear.getFullYear() - 1);
         dateStart = lastYear;
     }
-    if (!dateEnd || dateEnd === null) {
-        dateEnd = new Date();
-    }
-
-    if (!offset || offset === null) {
-        offset = 0;
-    }
-    if (!limit || limit === null) {
-        limit = 10;
-    }
+    if (!dateEnd) dateEnd = new Date();
+    if (!offset) offset = 0;
+    if (!limit) limit = 10;
 
     const manager = await User.findOne({ where: { userID: managerID } });
     if (!manager) {
         throw new ResponseError(404, "Manager not found");
     }
+
     const departmentID = manager.departmentID;
 
     const requests = await Request.findAll({
         where: {
             createdAt: { [Op.between]: [dateStart, dateEnd] },
-            ...(status ? { status: status } : {})
+            ...(status ? { status } : {})
         },
-        include: [{
-            model: User,
-            where: {
-                role: 'employee',
-                departmentID: departmentID
+        include: [
+            {
+                model: User,
+                as: 'creator',
+                where: {
+                    role: 'employee',
+                    departmentID
+                },
+                attributes: ['userID', 'fullName', 'email']
             },
-            attributes: ['userID', 'fullName', 'email']
-        }],
-        offset: offset,
-        limit: limit,
+            {
+                model: User,
+                as: 'checkedByUser',
+                attributes: ['userID', 'fullName', 'email']
+            }
+        ],
+        offset,
+        limit,
         order: [['createdAt', 'DESC']]
     });
+
     return requests;
-}
+};
+
+
+const countRequestsByStatus = async (status, departmentID) => {
+    return await Request.count({
+        where: { status },
+        include: [{
+            model: User,
+            as: 'creator',
+            where: {
+                role: 'employee',
+                departmentID
+            },
+        }]
+    });
+};
+
+const getTotalRequestByManager = async (managerID) => {
+    const manager = await User.findOne({ where: { userID: managerID } });
+    if (!manager) {
+        throw new ResponseError(404, "Manager not found");
+    }
+
+    const departmentID = manager.departmentID;
+
+    const [totalPending, totalApproved, totalRejected] = await Promise.all([
+        countRequestsByStatus('pending', departmentID),
+        countRequestsByStatus('approved', departmentID),
+        countRequestsByStatus('rejected', departmentID),
+    ]);
+
+    const total = totalPending + totalApproved + totalRejected;
+
+    return { totalPending, totalApproved, totalRejected, total };
+};
+
+
 
 const editStatusRequestByRoot = async (requestID, user, status, reasonReject = null) => {
     // Kiểm tra request
@@ -368,6 +425,7 @@ module.exports = {
     getAllRequestByRoot,
     getTotalRequestByRoot,
     getAllRequestByManager,
+    getTotalRequestByManager,
     editStatusRequestByRoot,
     editStatusRequestByManager
 }
