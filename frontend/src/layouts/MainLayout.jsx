@@ -44,9 +44,10 @@ const menuConfig = {
     manager: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
         { text: "Chấm công", icon: DashboardIcon, path: "/me/checkinout" },
-        { text: "Yêu cầu", icon: RequestPageIcon, path: "/me/request" },
+        { text: "Yêu cầu của tôi", icon: RequestPageIcon, path: "/me/request" },
         { text: "Quản lý phòng ban", icon: DashboardIcon, path: "/manager/department" },
         { text: "Quản lý yêu cầu", icon: RequestPageIcon, path: "/manager/request" },
+        { text: "Báo cáo", icon: ReportIcon, path: "/manager/report" },
     ],
     employee: [
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
