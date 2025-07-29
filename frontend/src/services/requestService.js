@@ -62,4 +62,26 @@ export const getMyRequest = async (offset = 0, limit = 10, dateStart, dateEnd, s
     }
 };
 
+export const getTotalRequestByManager = async () => {
+    try {
+        const response = await axios.get("/me/manager/request/total");
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getAllRequestsByManager = async (offset = 0, limit = 10, dateStart = null, dateEnd = null, status = null) => {
+    try {
+        const params = { offset, limit };
+        if (dateStart) params.dateStart = dateStart;
+        if (dateEnd) params.dateEnd = dateEnd;
+        if (status) params.status = status;
+
+        const response = await axios.get("/me/manager/request", { params });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 

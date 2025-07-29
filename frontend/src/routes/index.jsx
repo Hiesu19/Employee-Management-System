@@ -23,7 +23,7 @@ import MyRequests from "../pages/employee/request";
 import AddRequest from "../pages/employee/request/addRequest";
 
 import DepartmentManager from "../pages/manager/department";
-
+import RequestManager from "../pages/manager/request";
 
 export default function AppRoutes() {
   return (
@@ -61,6 +61,7 @@ export default function AppRoutes() {
 
           <Route element={<RequireRole allowedRoles={["manager"]} />}>
             <Route path="/manager/department" element={<DepartmentManager />} />
+            <Route path="/manager/request" element={<RequestManager />} />
           </Route>
 
         </Route>

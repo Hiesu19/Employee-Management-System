@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllRequestsByRoot, updateRequestStatusByRoot, getTotalRequestByRoot } from '../../../services/requestService';
+import { getAllRequestsByManager, updateRequestStatusByRoot, getTotalRequestByManager } from '../../../services/requestService';
 import {
     Box,
     Typography,
@@ -24,6 +24,7 @@ import {
     IconButton,
     Tooltip,
     Divider,
+    CircularProgress,
 } from '@mui/material';
 
 import {
@@ -34,7 +35,7 @@ import {
 
 import { formatDateTime, formatDate } from '../../../utils/formatDate';
 
-function Request() {
+function RequestManager() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState({
@@ -51,7 +52,6 @@ function Request() {
     const [page, setPage] = useState(0);
     const [tab, setTab] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [totalCount, setTotalCount] = useState(0);
 
     //Dialog
     const [openDialog, setOpenDialog] = useState(false);
@@ -59,7 +59,6 @@ function Request() {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [newStatus, setNewStatus] = useState('');
     const [rejectionReason, setRejectionReason] = useState('');
-    const [dialogType, setDialogType] = useState('');
 
     const getStatusFromTab = (tabIndex) => {
         switch (tabIndex) {
@@ -76,17 +75,19 @@ function Request() {
             const status = getStatusFromTab(tab);
             const offset = page * rowsPerPage;
 
-            const response = await getAllRequestsByRoot(offset, rowsPerPage, null, null, status);
-            setRequests(response.data.requests || []);
-            setTotalCount(response.data.count || 0);
+            const response = await getAllRequestsByManager(offset, rowsPerPage, null, null, status);
+
+            // Backend trả về array trực tiếp, không có wrapper
+            const requestsData = response.data || [];
+            setRequests(requestsData);
 
         } catch (error) {
+            console.error('Error fetching requests:', error);
             setMessage({
                 type: 'error',
                 message: 'Có lỗi xảy ra khi tải dữ liệu'
             });
             setRequests([]);
-            setTotalCount(0);
         } finally {
             setLoading(false);
         }
@@ -94,7 +95,7 @@ function Request() {
 
     const fetchTotal = async () => {
         try {
-            const response = await getTotalRequestByRoot();
+            const response = await getTotalRequestByManager();
             setTotal(response.data || {
                 totalPending: 0,
                 totalApproved: 0,
@@ -128,13 +129,6 @@ function Request() {
         setPage(0);
     };
 
-    const handleStatusUpdate = (request) => {
-        setSelectedRequest(request);
-        setNewStatus('');
-        setRejectionReason('');
-        setOpenDialog(true);
-    };
-
     const handleViewRequest = (request) => {
         setSelectedRequest(request);
         setOpenViewDialog(true);
@@ -161,7 +155,6 @@ function Request() {
         setSelectedRequest(request);
         setNewStatus('rejected');
         setRejectionReason('');
-        setDialogType('reject');
         setOpenDialog(true);
     };
 
@@ -187,9 +180,6 @@ function Request() {
         setMessage({ type: null, message: null });
     };
 
-    const formatDate = (date) => {
-        return new Date(date).toLocaleDateString('vi-VN');
-    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -228,8 +218,23 @@ function Request() {
         }
     };
 
+    // Tính total count cho tab hiện tại
+    const getCurrentTabTotal = () => {
+        switch (tab) {
+            case 0: return total.total;
+            case 1: return total.totalPending;
+            case 2: return total.totalApproved;
+            case 3: return total.totalRejected;
+            default: return 0;
+        }
+    };
+
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                <CircularProgress />
+            </Box>
+        );
     }
 
     return (
@@ -291,7 +296,10 @@ function Request() {
                                     <TableCell>
                                         <Box>
                                             <Typography variant="body2" fontWeight={500}>
-                                                {request.userEmail}
+                                                {request.User?.email || request.userEmail}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {request.User?.fullName}
                                             </Typography>
                                         </Box>
                                     </TableCell>
@@ -321,7 +329,6 @@ function Request() {
                                                     <VisibilityIcon fontSize="small" />
                                                 </IconButton>
                                             </Tooltip>
-
 
                                             {request.status === 'pending' && (
                                                 <Tooltip title="Phê duyệt">
@@ -365,7 +372,7 @@ function Request() {
 
                 <TablePagination
                     component="div"
-                    count={totalCount}
+                    count={getCurrentTabTotal()}
                     page={page}
                     onPageChange={handleChangePage}
                     rowsPerPage={rowsPerPage}
@@ -384,6 +391,7 @@ function Request() {
                 />
             </Paper>
 
+            {/* Dialogs giữ nguyên */}
             <Dialog open={openViewDialog} onClose={() => setOpenViewDialog(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Chi tiết yêu cầu</DialogTitle>
                 <DialogContent>
@@ -543,7 +551,7 @@ function Request() {
                                     Thông tin yêu cầu:
                                 </Typography>
                                 <Typography variant="body2">
-                                    <strong>Nhân viên:</strong> {selectedRequest.userEmail}
+                                    <strong>Nhân viên:</strong> {selectedRequest.User?.email || selectedRequest.userEmail}
                                 </Typography>
                                 <Typography variant="body2">
                                     <strong>Loại:</strong> {getTypeText(selectedRequest.type)}
@@ -574,4 +582,4 @@ function Request() {
     );
 }
 
-export default Request;
+export default RequestManager;
