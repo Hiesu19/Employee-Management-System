@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios from "./axios";
+import { getUser } from "./authService";
 
 export const getMyProfile = async () => {
     try {
@@ -12,6 +13,10 @@ export const getMyProfile = async () => {
 export const updateMyProfile = async (data) => {
     try {
         const response = await axios.put("/me", data);
+        const user = getUser();
+        user.fullName = response.data.data.fullName;
+        user.phone = response.data.data.phone;
+        localStorage.setItem('user', JSON.stringify(user));
         return response.data;
     } catch (error) {
         throw error;
@@ -37,6 +42,9 @@ export const updateMyAvatar = async (avatar) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
+        const user = getUser();
+        user.avatarURL = response.data.data.avatarURL;
+        localStorage.setItem('user', JSON.stringify(user));
         return response.data;
     } catch (error) {
         throw error;

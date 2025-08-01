@@ -9,7 +9,7 @@ const getMyInfo = async (userID) => {
         attributes: { exclude: ['password'] },
         include: {
             model: Department,
-            attributes: { exclude: ['departmentID'] }
+            attributes: { exclude: ['departmentID'] },
         }
     });
     if (!employee) {
@@ -26,7 +26,7 @@ const getMyInfo = async (userID) => {
         avatarURL: employee.avatarURL,
         createdAt: employee.createdAt,
         updatedAt: employee.updatedAt,
-        department: employee.Department.departmentName
+        department: employee.Department ? employee.Department.departmentName : null
     }
     return result;
 }
