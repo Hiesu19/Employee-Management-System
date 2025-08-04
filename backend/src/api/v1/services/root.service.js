@@ -1,6 +1,7 @@
 const { User, Department, Request, CheckInOut } = require('../models/index.model');
 const { ResponseError } = require('../error/ResponseError.error');
 const { Op } = require('sequelize');
+const { validateEmail } = require('../validation/email.validation');
 
 const getEmployeeInfo = async (employeeID) => {
     const employeeFound = await User.findOne({

@@ -1,0 +1,154 @@
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: Đăng nhập
+      description: API đăng nhập người dùng
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "root@example.com"
+                password:
+                  type: string
+                  example: "123456@"
+      responses:
+        "200":
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Không tìm thấy user hoặc mật khẩu không đúng
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  message:
+                    type: string
+                    example: "Invalid password"
+
+  /api/v1/auth/refresh:
+    post:
+      summary: Làm mới token
+      description: API làm mới access token bằng refresh token
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Làm mới token thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshTokenResponse"
+        "401":
+          description: Refresh token không hợp lệ
+
+  /api/v1/auth/logout:
+    post:
+      summary: Đăng xuất
+      description: API đăng xuất và xóa refresh token
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutResponse"
+        "401":
+          description: Refresh token không hợp lệ
+
+  /api/v1/auth/register:
+    post:
+      summary: Đăng ký
+      description: API đăng ký người dùng
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - phone
+              properties:
+                fullName:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john.doe@example.com"
+                phone:
+                  type: string
+                  example: "1234567890"
+      responses:
+        "200":
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+
+  /api/v1/auth/change-password:
+    post:
+      summary: Đổi mật khẩu
+      description: API đổi mật khẩu
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  example: "123456@"
+                newPassword:
+                  type: string
+                  example: "123456#"
+      responses:
+        "200":
+          description: Đổi mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePasswordResponse"
+

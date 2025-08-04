@@ -1,0 +1,411 @@
+paths:
+  /api/v1/root/employee:
+    get:
+      summary: Lấy danh sách nhân viên
+      description: API lấy danh sách nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy danh sách nhân viên thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeListResponse"
+        "401":
+          description: Token không hợp lệ
+
+  /api/v1/root/employee/{employeeID}:
+    get:
+      summary: Lấy thông tin nhân viên
+      description: API lấy thông tin nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID của nhân viên
+      responses:
+        "200":
+          description: Lấy thông tin nhân viên thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeResponse"
+        "401":
+          description: Token không hợp lệ
+        "404":
+          description: Nhân viên không tồn tại
+    put:
+      summary: Cập nhật thông tin nhân viên
+      description: API cập nhật thông tin nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID của nhân viên
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  example: "Nguyễn Thái Hiếu"
+                phone:
+                  type: string
+                  example: "0900000002"
+      responses:
+        "200":
+          description: Cập nhật thông tin nhân viên thành công
+        "404":
+          description: Nhân viên không tồn tại
+        "400":
+          description: Cập nhật thông tin nhân viên thất bại
+    delete:
+      summary: Xóa nhân viên
+      description: API xóa nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID của nhân viên
+      responses:
+        "200":
+          description: Xóa nhân viên thành công
+        "404":
+          description: Nhân viên không tồn tại
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/employee/search:
+    get:
+      summary: Tìm kiếm nhân viên
+      description: API tìm kiếm nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: email
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tìm kiếm nhân viên thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmployeeListResponse"
+        "401":
+          description: Token không hợp lệ
+
+  /api/v1/root/employee/{employeeID}/avatar:
+    post:
+      summary: Thay đổi ảnh đại diện cho nhận viên
+      description: API thay đổi ảnh đại diện cho nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: employeeID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID của nhân viên
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Ảnh đại diện của nhân viên
+      responses:
+        "200":
+          description: Thay đổi ảnh đại diện thành công
+        "404":
+          description: Nhân viên không tồn tại
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/employee/reset-password:
+    put:
+      summary: Đặt lại mật khẩu cho 1 danh sách nhân viên
+      description: API đặt lại mật khẩu cho 1 danh sách nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeIDArray:
+                  type: array
+                  items:
+                    type: string
+                  example: ["user102", "user103"]
+      responses:
+        "200":
+          description: Đặt lại mật khẩu thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResetPasswordResponse"
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/employee/change-department:
+    put:
+      summary: Thay đổi phòng ban cho 1 danh sách nhân viên
+      description: API thay đổi phòng ban cho 1 danh sách nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeID:
+                  type: string
+                  example: "b91a36c9-be3b-4717-89d9-9ec0fdcf6ed1"
+                departmentID:
+                  type: string
+                  example: "2"
+      responses:
+        "200":
+          description: Thay đổi phòng ban thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeDepartmentResponse"
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/employee/change-role:
+    put:
+      summary: Thay đổi vai trò cho 1 nhân viên
+      description: API thay đổi vai trò cho 1 nhân viên
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                employeeID:
+                  type: string
+                  example: "b91a36c9-be3b-4717-89d9-9ec0fdcf6ed1"
+                role:
+                  type: string
+                  example: "manager"
+
+      responses:
+        "200":
+          description: Thay đổi vai trò thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangeRoleResponse"
+
+  /api/v1/root/request:
+    get:
+      summary: Lấy danh sách yêu cầu
+      description: API lấy danh sách yêu cầu
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: dateStart
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: dateEnd
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lấy danh sách yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestListResponse"
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/request/total:
+    get:
+      summary: Lấy tổng số yêu cầu
+      description: API lấy tổng số yêu cầu của root
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy tổng số yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPending:
+                    type: integer
+                    example: 0
+                  totalApproved:
+                    type: integer
+                    example: 8
+                  totalRejected:
+                    type: integer
+                    example: 8
+                  total:
+                    type: integer
+                    example: 16
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/request/{requestID}:
+    put:
+      summary: Chấp nhận hoặc từ chối yêu cầu
+      description: API chấp nhận hoặc từ chối yêu cầu
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: requestID
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID của yêu cầu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [approved, rejected]
+                  example: rejected
+                reasonReject:
+                  type: string
+                  example: "Đi làm đi không thích cho nghỉ đâu"
+      responses:
+        "200":
+          description: Cập nhật yêu cầu thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Edit status request successfully"
+        "401":
+          description: Token không hợp lệ
+        "404":
+          description: Yêu cầu không tồn tại
+        "400":
+          description: Yêu cầu không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/root/dashboard:
+    get:
+      summary: Lấy thông tin cho trang dashboard
+      description: API lấy thông tin cho trang dashboard
+      tags:
+        - Root
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy thông tin cho trang dashboard thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResponse"
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
