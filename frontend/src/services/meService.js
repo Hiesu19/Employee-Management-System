@@ -35,7 +35,7 @@ export const changePassword = async (currentPassword, newPassword) => {
 export const updateMyAvatar = async (avatar) => {
     try {
         const formData = new FormData();
-        formData.append('avatar', avatar);l
+        formData.append('avatar', avatar);
 
         const response = await axios.post("/me/avatar", formData, {
             headers: {

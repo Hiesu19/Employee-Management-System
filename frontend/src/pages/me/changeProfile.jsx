@@ -16,7 +16,10 @@ import { updateMyProfile, getMyProfile, updateMyAvatar } from "../../services/me
 import AvatarUploader from "../../components/AvatarUploader";
 
 function ChangeProfile() {
-    const [profileData, setProfileData] = useState({});
+    const [profileData, setProfileData] = useState({
+        fullName: "",
+        phone: ""
+    });
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState({ type: null, text: null });
     const [loading, setLoading] = useState(false);
@@ -26,10 +29,8 @@ function ChangeProfile() {
         try {
             setLoading(true);
             const response = await getMyProfile();
-            console.log('Profile response:', response.data); // Debug log
             setProfileData(response.data);
             setCurrentAvatar(response.data.avatarURL);
-            console.log('Current avatar URL:', response.data.avatarURL); // Debug log
         } catch (error) {
             console.error(error);
         } finally {

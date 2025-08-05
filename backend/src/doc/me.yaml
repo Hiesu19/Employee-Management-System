@@ -361,8 +361,8 @@ paths:
       description: Lấy danh sách yêu cầu trong phòng ban mà tôi đang quản lý
       tags:
         - Me
-      security:
-        - bearerAuth: []
+        security:
+          - bearerAuth: []
       parameters:
         - name: offset
           in: query
@@ -440,52 +440,4 @@ paths:
                       total:
                         type: integer
                         example: 6
-                  
-
-  /api/v1/me/manager/request/{requestID}:
-    put:
-      summary: Cập nhật trạng thái yêu cầu
-      description: Cập nhật trạng thái yêu cầu
-      tags:
-        - Me
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: requestID
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                reasonReject:
-                  type: string
-                  example: "Không cho"
-                status: 
-                  type: string
-                  example: "rejected"
-      responses:
-        "200":
-          description: Thành công
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: string
-                    example: "success"
-                  message:
-                    type: string
-                    example: "Edit status request successfully"
-        "401":
-          description: Token không hợp lệ
-        "500":
-          description: Lỗi server
 
