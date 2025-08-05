@@ -10,7 +10,7 @@ exports.generateAccessToken = (user) => {
             departmentID: user.departmentID,
         },
         process.env.JWT_ACCESS_KEY,
-        { expiresIn: "2h" }
+        { expiresIn: "3m" }
     );
 }
 
@@ -24,7 +24,7 @@ exports.generateRefreshToken = (user) => {
             departmentID: user.departmentID,
         },
         process.env.JWT_REFRESH_KEY,
-        { expiresIn: "7d" }
+        { expiresIn: "2d" }
     );
 }
 

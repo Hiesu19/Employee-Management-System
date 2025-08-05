@@ -11,7 +11,7 @@ router.post('/login', AuthController.login);
 router.post('/register', verifyTokenAndCheckRole(['root']), AuthController.register);
 
 // POST refresh-token.
-router.post('/refresh-token', verifyToken, AuthController.refreshToken);
+router.post('/refresh-token', AuthController.refreshToken);
 
 // POST logout.
 router.post('/logout', verifyToken, AuthController.logout);
