@@ -1,0 +1,63 @@
+paths:
+  /api/v1/report/export/employee-in-department:
+    get:
+      summary: Lấy danh sách nhân viên trong phòng ban
+      description: Lấy danh sách nhân viên trong phòng ban
+      tags:
+        - Report
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Thành công - trả về file excel
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/report/export/employee-in-company:
+    get:
+      summary: Lấy danh sách nhân viên trong công ty
+      description: Lấy danh sách nhân viên trong công ty
+      tags:
+        - Report
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Thành công - trả về file excel
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /api/v1/report/export/work-time:
+    get:
+      summary: Lấy báo cáo thời gian làm việc
+      description: Lấy báo cáo thời gian làm việc
+      tags:
+        - Report
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Thành công - trả về file excel
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Token không hợp lệ
+        "500":
+          description: Lỗi server
