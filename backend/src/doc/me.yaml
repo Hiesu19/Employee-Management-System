@@ -58,13 +58,14 @@ paths:
       requestBody:
         required: true
         content:
-          file:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 avatar:
                   type: string
                   format: binary
+                  description: Ảnh đại diện của tôi
       responses:
         "200":
           description: Thành công
@@ -361,8 +362,8 @@ paths:
       description: Lấy danh sách yêu cầu trong phòng ban mà tôi đang quản lý
       tags:
         - Me
-        security:
-          - bearerAuth: []
+      security:
+        - bearerAuth: []
       parameters:
         - name: offset
           in: query
