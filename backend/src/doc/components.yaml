@@ -1,0 +1,795 @@
+components:
+  # Auth
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: "root@example.com"
+        fullName:
+          type: string
+          example: "Nguyễn Văn A"
+        phone:
+          type: string
+          example: "0123456789"
+        role:
+          type: string
+          enum: [employee, manager, root]
+          example: "employee"
+        departmentId:
+          type: integer
+          example: 1
+        avatar:
+          type: string
+          example: "avatar-url.jpg"
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Đăng nhập thành công"
+        data:
+          type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/User"
+            accessToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    RefreshTokenResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Làm mới token thành công"
+        data:
+          type: object
+          properties:
+            accessToken:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    LogoutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Logout successfully"
+        data:
+          type: object
+          properties:
+            data:
+              type: string
+              example: "Logout successfully"
+
+    RegisterResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "User created successfully"
+        data:
+          $ref: "#/components/schemas/User"
+
+    ChangePasswordResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Change password successfully"
+        data:
+          type: object
+          properties:
+            data:
+              type: string
+              example: "Change password successfully"
+
+    # Root
+    EmployeeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get employee info successfully"
+        data:
+          $ref: "#/components/schemas/Employee1"
+
+    Employee1:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: "user102"
+        fullName:
+          type: string
+          example: "Nguyễn Thái Hiếu"
+        email:
+          type: string
+          example: "hieu3@example.com"
+        phone:
+          type: string
+          example: "0900000002"
+        role:
+          type: string
+          example: "employee"
+        avatarURL:
+          type: string
+          example: "avatar-url.jpg"
+        mustChangePassword:
+          type: boolean
+          example: true
+        departmentID:
+          type: string
+          example: "1"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        Department:
+          type: object
+          properties:
+            departmentName:
+              type: string
+              example: "D1"
+            departmentID:
+              type: string
+              example: "1"
+
+    Employee2:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: "b91a36c9-be3b-4717-89d9-9ec0fdcf6ed1"
+        fullName:
+          type: string
+          example: "Hiếu"
+        email:
+          type: string
+          example: "hieu1@example.com"
+        phone:
+          type: string
+          example: "0900000002"
+        role:
+          type: string
+          example: "employee"
+        departmentID:
+          type: string
+          example: "1"
+        departmentName:
+          type: string
+          example: "D1"
+
+    EmployeeListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get employee list successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Employee1"
+
+    ResetPasswordResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Reset password successfully"
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: "Reset password successfully 2/2"
+            emailArraySuccess:
+              type: array
+              items:
+                type: string
+              example: ["hieu1@example.com", "user103@example.com"]
+
+    ChangeDepartmentResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Change department successfully"
+        data:
+          $ref: "#/components/schemas/Employee2"
+
+    ChangeRoleResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Change role successfully Hiếu: employee -> manager"
+        data:
+          allOf:
+            - $ref: "#/components/schemas/Employee2"
+            - type: object
+              properties:
+                oldRole:
+                  type: string
+                  example: "employee"
+
+    Request:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "PVnzArd3"
+        userID:
+          type: string
+          example: "user103"
+        userEmail:
+          type: string
+          example: "hieu4@example.com"
+        type:
+          type: string
+          example: "other"
+        status:
+          type: string
+          example: "approved"
+        fromDate:
+          type: string
+          example: "2025-07-29T00:00:00.000Z"
+        toDate:
+          type: string
+          example: "2025-07-29T00:00:00.000Z"
+        reason:
+          type: string
+          example: "Về sớm đi đón con"
+        reasonReject:
+          type: string
+          example: "5b84fd3e-f048-4c7d-a17b-68b97a7a83eb"
+        createdAt:
+          type: string
+          example: "2025-07-29T08:10:26.250Z"
+        updatedAt:
+          type: string
+          example: "2025-07-29T08:13:18.101Z"
+        creator:
+          type: object
+          properties:
+            userID:
+              type: string
+              example: "user103"
+            fullName:
+              type: string
+              example: "Nguyễn Thái Hiếu"
+            email:
+              type: string
+              example: "hieu4@example.com"
+        checkedByUser:
+          type: object
+          properties:
+            userID:
+              type: string
+              example: "5b84fd3e-f048-4c7d-a17b-68b97a7a83eb"
+            fullName:
+              type: string
+              example: "Admin Hiếu"
+            email:
+              type: string
+              example: "root@example.com"
+
+    RequestListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get all request by root successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Request"
+
+    DashboardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get dashboard successfully"
+        data:
+          type: object
+          properties:
+            totalEmployees:
+              type: integer
+              example: 8
+            totalManagers:
+              type: integer
+              example: 5
+            countDepartment:
+              type: integer
+              example: 2
+            totalRequestsPending:
+              type: integer
+              example: 0
+            countCheckInToday:
+              type: integer
+              example: 1
+            countCheckOutToday:
+              type: integer
+              example: 0
+
+    # Department
+
+    Department:
+      type: object
+      properties:
+        departmentID:
+          type: string
+          example: "1"
+        departmentName:
+          type: string
+          example: "D1"
+        description:
+          type: string
+          example: "Division 1"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DepartmentListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get department list successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Department"
+
+    DepartmentDetailsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get department details successfully"
+        data:
+          allOf:
+            - $ref: "#/components/schemas/Department"
+            - type: object
+              properties:
+                managers:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Employee2"
+                employees:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Employee2"
+    # Me
+    CheckOutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Check out successfully"
+        data:
+          type: object
+          properties:
+            checkID:
+              type: string
+              example: "714843a2-fcea-4c87-8365-087347ff8d5e"
+            userID:
+              type: string
+              example: "user102"
+            userEmail:
+              type: string
+              example: "hieu3@example.com"
+            checkInTime:
+              type: string
+              example: "09:44:11"
+            checkOutTime:
+              type: string
+              example: "09:57:52"
+            date:
+              type: string
+              example: "2025-08-05"
+            createdAt:
+              type: string
+              example: "2025-08-05T02:44:11.582Z"
+
+    CheckInResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Check in successfully"
+        data:
+          type: object
+          properties:
+            checkID:
+              type: string
+              example: "714843a2-fcea-4c87-8365-087347ff8d5e"
+            userID:
+              type: string
+              example: "user102"
+            userEmail:
+              type: string
+              example: "hieu3@example.com"
+            checkInTime:
+              type: string
+              example: "09:44:11"
+            checkOutTime:
+              type: string
+              example: null
+            date:
+              type: string
+              example: "2025-08-05"
+            createdAt:
+              type: string
+              example: "2025-08-05T02:44:11.582Z"
+
+    CheckInOutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get my check in out successfully"
+        data:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 2
+            totalTimeWork:
+              type: integer
+              example: 821
+            checkInOut:
+              type: array
+              items:
+                type: object
+                properties:
+                  checkInTime:
+                    type: string
+                    example: "09:44:11"
+                  checkOutTime:
+                    type: string
+                    example: "09:57:52"
+                  date:
+                    type: string
+                    example: "2025-08-05"
+                  createdAt:
+                    type: string
+                    example: "2025-08-05T02:44:11.582Z"
+                  timeWork:
+                    type: integer
+                    example: 821
+
+    RequestResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Create request successfully"
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: "ko5Et-c6"
+            userID:
+              type: string
+              example: "user102"
+            userEmail:
+              type: string
+              example: "hieu3@example.com"
+            type:
+              type: string
+              example: "sick"
+            status:
+              type: string
+              example: "pending"
+            fromDate:
+              type: string
+              format: date-time
+              example: "2025-08-06T00:00:00.000Z"
+            toDate:
+              type: string
+              format: date-time
+              example: "2025-08-06T00:00:00.000Z"
+            reason:
+              type: string
+              example: "Hihi ahahh"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2025-08-05T03:26:08.792Z"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2025-08-05T03:26:08.792Z"
+            reasonReject:
+              type: string
+              nullable: true
+              example: null
+            checkedAt:
+              type: string
+              nullable: true
+              example: null
+            checkedBy:
+              type: string
+              nullable: true
+              example: null
+
+    GetMyRequestResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get my request successfully"
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequestResponse"
+
+    GetMyDepartmentResponse:
+      type: object
+      properties:
+        success:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get my department successfully"
+        data:
+          type: object
+          properties:
+            count:
+              type: integer
+              example: 4
+            result:
+              type: array
+              items:
+                type: object
+                properties:
+                  userID:
+                    type: string
+                    example: "84397564-1e1b-45fe-8275-4bd3726e55a7"
+                  fullName:
+                    type: string
+                    example: "Hiếu đẹp zai"
+                  email:
+                    type: string
+                    example: "33@gmail.com"
+                  phone:
+                    type: string
+                    example: "23456786543"
+                  role:
+                    type: string
+                    example: "employee"
+                  department:
+                    type: string
+                    example: "D1"
+                  avatarURL:
+                    type: string
+                    nullable: true
+                    example: "https://zinza-intern.s3.ap-southeast-1.amazonaws.com/avatars/84397564-1e1b-45fe-8275-4bd3726e55a7.jpg"
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: "2025-07-29T03:19:16.256Z"
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: "2025-08-04T08:23:46.137Z"
+
+    GetMyDepartmentEmployeeResponse:
+      type: object
+      properties:
+        success:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get my department employee successfully"
+        data:
+          type: object
+          properties:
+            userID:
+              type: string
+              example: "1"
+            fullName:
+              type: string
+              example: "Hiếu đẹp zai"
+            email:
+              type: string
+              example: "33@gmail.com"
+            phone:
+              type: string
+              example: "23456786543"
+            role:
+              type: string
+              example: "employee"
+            avatarURL:
+              type: string
+              nullable: true
+              example: "https://zinza-intern.s3.ap-southeast-1.amazonaws.com/avatars/84397564-1e1b-45fe-8275-4bd3726e55a7.jpg"
+            mustChangePassword:
+              type: boolean
+              example: true
+            departmentID:
+              type: string
+              example: "1"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2025-07-29T03:19:16.256Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2025-08-04T08:23:46.137Z"
+
+    ManagerRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "6Ty0p6uZ"
+        userID:
+          type: string
+          example: "user102"
+        userEmail:
+          type: string
+          example: "hieu3@example.com"
+        type:
+          type: string
+          enum: [sick, personal]
+          example: "sick"
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: "pending"
+        fromDate:
+          type: string
+          format: date-time
+          example: "2025-08-06T00:00:00.000Z"
+        toDate:
+          type: string
+          format: date-time
+          example: "2025-08-08T00:00:00.000Z"
+        reason:
+          type: string
+          example: "Trốn làm đi chơi với người yêu tí nha sếp."
+        reasonReject:
+          type: string
+          nullable: true
+          example: "Hahaha"
+        checkedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-08-04T09:03:40.260Z"
+        checkedBy:
+          type: string
+          nullable: true
+          example: "5b84fd3e-f048-4c7d-a17b-68b97a7a83eb"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-08-04T09:00:19.168Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-08-04T09:03:40.264Z"
+        creator:
+          $ref: '#/components/schemas/UserInfo'
+        checkedByUser:
+          allOf:
+            - $ref: '#/components/schemas/UserInfo'
+            - nullable: true
+
+    UserInfo:
+      type: object
+      properties:
+        userID:
+          type: string
+          example: "user102"
+        fullName:
+          type: string
+          example: "Nguyễn Thái Hiếu"
+        email:
+          type: string
+          example: "hieu3@example.com"
+
+    GetAllRequestByManagerResponse:
+      type: object
+      properties:
+        success:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Get all request by manager successfully"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ManagerRequest'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -26,6 +26,9 @@ import DepartmentManager from "../pages/manager/department";
 import RequestManager from "../pages/manager/request";
 import ReportManager from "../pages/manager/report";
 
+import ChangeProfile from "../pages/me/changeProfile";
+import ChangePassword from "../pages/me/changePassword";
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -39,6 +42,8 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/me/profile" element={<ChangeProfile />} />
+          <Route path="/me/change-password" element={<ChangePassword />} />
 
 
           <Route element={<RequireRole allowedRoles={["root"]} />}>

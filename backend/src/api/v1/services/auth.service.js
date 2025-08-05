@@ -7,6 +7,7 @@ const { ResponseError } = require('../error/ResponseError.error');
 const { validateEmail } = require('../validation/email.validation');
 const crypto = require("crypto");
 const { sendEmail } = require('../utils/send-email.utils');
+const { validatePassword } = require('../validation/password.validation');
 
 // Tạo user
 // Khi tạo xong trả về dữ liệu không có password
@@ -146,6 +147,7 @@ const changePassword = async (currentPassword, newPassword, userID) => {
         if (!isPasswordValid) {
             throw new ResponseError(400, "Invalid current password");
         }
+        validatePassword(newPassword);
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);

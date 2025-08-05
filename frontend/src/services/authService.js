@@ -40,9 +40,18 @@ export const changePassword = async (currentPassword, newPassword) => {
     }
 }
 
-export const logout = () => {
-
-    clearLocalStorage();
+export const logout = async () => {
+    try {
+        const response = await axios.post("/auth/logout");
+        if (response.data.success === "success") {
+            clearLocalStorage();
+            window.location.href = "/login";
+            return true;
+        }
+        return false;
+    } catch (error) {
+        throw error;
+    }
 }
 
 // 0: Chưa đăng nhập
@@ -88,4 +97,3 @@ export const clearLocalStorage = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
 }
-

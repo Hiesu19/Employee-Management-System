@@ -6,15 +6,15 @@ const { Op } = require('sequelize');
 const getMyInfo = async (userID) => {
     const employee = await User.findOne({
         where: { userID: userID },
-        attributes: { exclude: ['password'] }
+        attributes: { exclude: ['password'] },
+        include: {
+            model: Department,
+            attributes: { exclude: ['departmentID'] },
+        }
     });
     if (!employee) {
         throw new ResponseError(404, "Employee not found");
     }
-    const department = await Department.findOne({
-        where: { departmentID: employee.departmentID },
-        attributes: { exclude: ['departmentID'] }
-    });
 
     const result = {
         userID: employee.userID,
@@ -26,7 +26,7 @@ const getMyInfo = async (userID) => {
         avatarURL: employee.avatarURL,
         createdAt: employee.createdAt,
         updatedAt: employee.updatedAt,
-        department: department
+        department: employee.Department ? employee.Department.departmentName : null
     }
     return result;
 }

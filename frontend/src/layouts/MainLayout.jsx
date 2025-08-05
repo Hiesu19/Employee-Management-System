@@ -53,7 +53,6 @@ const menuConfig = {
         { text: "Trang chủ", icon: HomeIcon, path: "/" },
         { text: "Chấm công", icon: DashboardIcon, path: "/me/checkinout" },
         { text: "Yêu cầu", icon: RequestPageIcon, path: "/me/request" },
-        { text: "Thông tin cá nhân", icon: PersonIcon, path: "/me/profile" },
     ],
 };
 
@@ -94,13 +93,13 @@ function MainLayout() {
         handleMenuClose();
     };
 
-    const handleChangePassword = () => {
-        navigate("/change-password");
+    const handleChangeProfile = () => {
+        navigate("/me/profile");
         handleMenuClose();
     };
 
-    const handleChangeAvatar = () => {
-        navigate("/change-avatar");
+    const handleChangePassword = () => {
+        navigate("/me/change-password");
         handleMenuClose();
     };
 
@@ -250,14 +249,14 @@ function MainLayout() {
                         }
                     }}
                 >
+                    <MenuItem onClick={handleChangeProfile} sx={{ py: 1.5 }}>
+                        <PersonIcon sx={{ mr: 2 }} />
+                        <Typography>Thông tin cá nhân</Typography>
+                    </MenuItem>
+
                     <MenuItem onClick={handleChangePassword} sx={{ py: 1.5 }}>
                         <PersonIcon sx={{ mr: 2 }} />
                         <Typography>Đổi mật khẩu</Typography>
-                    </MenuItem>
-
-                    <MenuItem onClick={handleChangeAvatar} sx={{ py: 1.5 }}>
-                        <PersonIcon sx={{ mr: 2 }} />
-                        <Typography>Đổi ảnh đại diện</Typography>
                     </MenuItem>
 
                     <Divider />

@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./doc/swagger');
 
 const db = require("./config/db.config");
 const route = require("./api/v1/routes/index.route");
@@ -27,8 +29,12 @@ app.use(cookieParser());
 
 route(app);
 
+
+
 // error middleware
 app.use(errorMiddleware);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.listen(process.env.PORT || 8001, () => {
