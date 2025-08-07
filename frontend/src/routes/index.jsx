@@ -4,7 +4,7 @@ import Login from "../pages/auth/Login";
 import MustChangePassword from "../pages/auth/MustChangePassword";
 import NotFound from "../pages/error/NotFound";
 import Unauthorized from "../pages/error/Unauthorized";
-import Home from "../pages/Home";
+import Home from "../pages/home";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import RequireRole from "../components/RequireRole";
