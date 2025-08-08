@@ -1,11 +1,11 @@
-const AuthController = require('../../src/api/v1/controller/AuthController.controller');
-const authService = require('../../src/api/v1/services/auth.service');
-const { ResponseError } = require('../../src/api/v1/error/ResponseError.error');
+const AuthController = require('../../../src/api/v1/controller/AuthController.controller');
+const authService = require('../../../src/api/v1/services/auth.service');
+const { ResponseError } = require('../../../src/api/v1/error/ResponseError.error');
 
-const { successResponse, errorResponse } = require('../../src/api/v1/utils/response.utils');
+const { successResponse, errorResponse } = require('../../../src/api/v1/utils/response.utils');
 
-jest.mock('../../src/api/v1/services/auth.service');
-jest.mock('../../src/api/v1/utils/response.utils', () => ({
+jest.mock('../../../src/api/v1/services/auth.service');
+jest.mock('../../../src/api/v1/utils/response.utils', () => ({
     successResponse: jest.fn().mockImplementation((res, data, message) => {
         res.status(200).json({
             success: "success",
