@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  backend-intern:
+  backend:
     build:
       context: ./backend
     env_file:
@@ -19,13 +19,13 @@ services:
       - postgres
     ports:
       - "8001:8001"
-  frontend-intern:
+  frontend:
     build:
       context: ./frontend
     env_file:
       - ./frontend/.env
     depends_on:
-      - backend-intern
+      - backend
     ports:
       - "5173:5173"
 volumes:
