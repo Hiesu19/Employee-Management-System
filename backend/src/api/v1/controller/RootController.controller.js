@@ -9,7 +9,7 @@ class RootController {
         try {
             const { employeeID } = req.params;
             const employee = await rootService.getEmployeeInfo(employeeID);
-            successResponse(res, employee, "Get employee info successfully ");
+            successResponse(res, employee, "Get employee info successfully");
         } catch (error) {
             next(error);
         }
