@@ -1,0 +1,21 @@
+services:
+  db_test:
+    image: postgres:14.18
+    container_name: e2e_postgres_test
+    environment:
+      POSTGRES_USER: postgresdev
+      POSTGRES_PASSWORD: rootdev
+      POSTGRES_DB: postgresdev
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgresdev -d postgresdev"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_dev_data:
+  postgres_test_data:

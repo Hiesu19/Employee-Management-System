@@ -1,7 +1,12 @@
+const dotenv = require("dotenv");
+dotenv.config({
+    path: process.env.NODE_ENV === "development" ? ".env.development" : ".env"
+});
+
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const dotenv = require("dotenv");
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./doc/swagger');
 
@@ -9,7 +14,6 @@ const db = require("./config/db.config");
 const route = require("./api/v1/routes/index.route");
 const errorMiddleware = require("./api/v1/middleware/error.middleware");
 
-dotenv.config();
 
 const app = express();
 
@@ -38,6 +42,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
 app.listen(process.env.PORT || 8001, () => {
+    console.log("Server is running MODE: " + (process.env.NODE_ENV || "production"));
     console.log(`Server is running on http://localhost:${process.env.PORT}`);
 });
 
