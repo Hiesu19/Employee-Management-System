@@ -2,3 +2,4 @@ node_modules/
 .env
 .env.test
 backend/coverage
+backend/tests/e2e/root/temp-avatar.jpg
