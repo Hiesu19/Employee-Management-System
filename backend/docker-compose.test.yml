@@ -6,8 +6,6 @@ services:
       POSTGRES_USER: postgrestest
       POSTGRES_PASSWORD: roottest
       POSTGRES_DB: postgrestest
-    ports:
-      - "5433:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
     healthcheck:
@@ -15,6 +13,23 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  backend_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: e2e_backend_test
+    depends_on:
+      db_test:
+        condition: service_healthy
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    env_file:
+      - .env.test
+    working_dir: /app
+    command: >
+      sh -c "npm install && npx cross-env NODE_ENV=test jest --verbose --runInBand --testMatch='**/tests/e2e/**/*.test.js'"
 
 volumes:
   postgres_test_data:
