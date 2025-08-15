@@ -1,0 +1,93 @@
+stages:
+  - run
+  - test
+  - build
+
+variables:
+  NODE_VERSION: "22"
+
+# Chạy backend
+run-backend:
+  stage: run
+  image: node:${NODE_VERSION}
+  services:
+    - name: postgres:14.18
+      alias: db
+      variables:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: postgres
+        POSTGRES_HOST: db
+        POSTGRES_PORT: 5432
+  before_script:
+    - apt-get update && apt-get install -y postgresql-client
+    - apt-get install -y curl
+    - cd backend
+    - npm install
+    # Tạo file .env cho test
+    - echo "NODE_ENV=test" > .env
+    - echo "PORT=3000" >> .env
+    - echo "DB_HOST=db" >> .env
+    - echo "DB_PORT=5432" >> .env
+    - echo "DB_NAME=postgres" >> .env
+    - echo "DB_USER=postgres" >> .env
+    - echo "DB_PASSWORD=postgres" >> .env
+    - echo "DB_DIALECT=postgres" >> .env
+    - echo "JWT_SECRET=test_secret_key" >> .env
+    - echo "JWT_REFRESH_SECRET=test_refresh_secret_key" >> .env
+    - echo "EMAIL_HOST=smtp.gmail.com" >> .env
+    - echo "EMAIL_PORT=587" >> .env
+    - echo "EMAIL_USER=test@example.com" >> .env
+    - echo "EMAIL_PASS=test_password" >> .env
+    - echo "CLIENT_URL=http://localhost:5173" >> .env
+  script:
+    - until pg_isready -h postgres -p 5432 -U test_user; do sleep 1; done
+    - npx sequelize-cli db:migrate
+    - npm start &
+    - sleep 5
+    - curl -f http://localhost:3000/api/v1/api-docs || exit 1
+    - pkill -f "npm start" || true
+  artifacts:
+    paths:
+      - backend/
+    expire_in: 1 hour
+
+# Chạy thử frontend
+run-frontend:
+  stage: run
+  image: node:${NODE_VERSION}
+  before_script:
+    - apt-get update && apt-get install -y curl
+  script:
+    - cd frontend
+    - npm install
+    - npm run dev &
+    - sleep 5
+    - curl -f http://localhost:5173 || exit 1
+    - pkill -f "npm run dev" || true
+  artifacts:
+    paths:
+      - backend/
+    expire_in: 1 hour
+
+# Test unit backend
+test-unit:
+  stage: test
+  image: node:${NODE_VERSION}
+  before_script:
+    - apt-get update
+  script:
+    - cd backend
+    - npm install
+    - npm run test:unit
+
+# Build frontend
+build-frontend:
+  stage: build
+  image: node:${NODE_VERSION}
+  before_script:
+    - apt-get update
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
