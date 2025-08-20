@@ -1,3 +1,4 @@
+
 # Hệ thống Quản lý Nhân viên
 
 Dự án full-stack quản lý hệ thống nhân viên, phòng ban và yêu cầu với backend Node.js và frontend React.
@@ -89,5 +90,3 @@ npm run migrate-seed-prod #Chỉ tạo mỗi acc root
 
 - [Backend README](./backend/README.md) - Hướng dẫn chi tiết backend
 - [Frontend README](./frontend/README.md) - Hướng dẫn chi tiết frontend
-
-
