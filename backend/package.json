@@ -7,11 +7,12 @@
     "migrate": "sequelize-cli db:migrate",
     "seed": "sequelize-cli db:seed:all",
     "migrate-seed": "npm run migrate && npm run seed",
+    "migrate-seed-prod": "npm run migrate && sequelize-cli db:seed --seed 20250710070051-create-root-user.js",
     "start:test": "cross-env NODE_ENV=test nodemon src/index.js",
     "migrate:test": "cross-env NODE_ENV=test sequelize-cli db:migrate",
     "seed:test": "cross-env NODE_ENV=test sequelize-cli db:seed:all",
     "test:unit": "jest --verbose --testMatch=**/tests/unit/**/*.test.js",
-    "test:e2e": "docker compose -f docker-compose.test.yml up -d && cross-env NODE_ENV=test jest --verbose --runInBand --testMatch=**/tests/e2e/**/*.test.js",
+    "test:e2e": "docker compose -f docker-compose.test.yml up --build",
     "start:pm2:test": "cross-env NODE_ENV=test pm2 start src/index.js -i 6 --name backend-test"
   },
   "keywords": [],

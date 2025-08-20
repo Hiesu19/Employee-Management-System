@@ -7,12 +7,13 @@ require('dotenv').config();
 module.exports = {
   async up(queryInterface, Sequelize) {
     const hashedPassword = await bcrypt.hash(process.env.ROOT_PASSWORD, 10);
+    const ROOT_EMAIL = process.env.ROOT_EMAIL || 'root@example.com';
 
     await queryInterface.bulkInsert('users', [
       {
         userID: uuidv4(),
         fullName: 'Root Admin',
-        email: 'root@example.com',
+        email: ROOT_EMAIL,
         phone: '0800000000',
         password: hashedPassword,
         role: 'root',
@@ -26,7 +27,7 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('users', {
-      email: 'root@example.com',
+      email: ROOT_EMAIL,
     });
   }
 };

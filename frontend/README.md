@@ -1,12 +1,77 @@
-# React + Vite
+# Frontend - Hệ thống Quản lý Nhân viên
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ứng dụng web React được xây dựng với Vite để quản lý giao diện người dùng cho hệ thống quản lý nhân viên.
 
-Currently, two official plugins are available:
+## Công nghệ sử dụng
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** - Thư viện UI
+- **Vite** - Build tool và dev server
+- **React Router** - Điều hướng trang
+- **Axios** - HTTP client
+- **Tailwind CSS** - Styling framework
 
-## Expanding the ESLint configuration
+## Yêu cầu hệ thống
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Node.js (phiên bản 18 trở lên)
+- npm hoặc yarn
+
+## Cài đặt
+
+1. **Cài đặt dependencies:**
+
+```bash
+cd frontend
+npm install
+```
+
+2. **Tạo file môi trường:**
+
+Tạo file `.env` trong thư mục `frontend`:
+
+```env
+VITE_API_URL=http://localhost:8001
+```
+
+## Chạy ứng dụng
+
+### Development Mode
+
+```bash
+# Chạy dev server
+npm run dev
+
+# Hoặc
+npm start
+```
+
+Ứng dụng sẽ chạy tại: http://localhost:5173
+
+### Build Production
+
+```bash
+# Build cho production
+npm run build
+
+# Preview build
+npm run preview
+```
+
+## Cấu trúc dự án
+
+```
+src/
+├── components/         # Components tái sử dụng
+│   ├── AvatarUploader.jsx
+│   ├── ProtectedRoute.jsx
+│   └── RequireRole.jsx
+├── pages/             # Các trang của ứng dụng
+│   ├── auth/          # Đăng nhập, đổi mật khẩu
+│   ├── employee/      # Giao diện nhân viên
+│   ├── manager/       # Giao diện quản lý
+│   ├── root/          # Giao diện admin
+│   └── me/            # Thông tin cá nhân
+├── services/          # API services
+├── utils/             # Tiện ích helper
+├── layouts/           # Layout chung
+└── routes/            # Cấu hình routing
+```
