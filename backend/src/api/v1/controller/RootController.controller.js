@@ -25,11 +25,11 @@ class RootController {
         }
     }
 
-    async searchEmployeeByEmailOrName(req, res, next) {
+    async searchEmployeeByEmailOrNameOrPhone(req, res, next) {
 
         try {
-            const { email, name } = req.query;
-            const employees = await rootService.searchEmployeeByEmailOrName(email, name);
+            const { keyword } = req.query;
+            const employees = await rootService.searchEmployeeByEmailOrNameOrPhone(keyword);
             successResponse(res, employees, "Search employee successfully");
         } catch (error) {
             next(error);

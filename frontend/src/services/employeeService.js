@@ -112,4 +112,14 @@ export const deleteEmployee = async (employeeID) => {
     }
 };
 
+export const searchEmployeeByEmailOrNameOrPhone = async (keyword) => {
+    try {
+        const response = await axios.get("/root/employee/search", {
+            params: { keyword }
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
 

@@ -12,7 +12,7 @@ router.put('/employee/change-department', verifyTokenAndCheckRole(['root']), Roo
 router.put('/employee/change-role', verifyTokenAndCheckRole(['root']), RootController.changeRole);
 
 router.get('/employee', verifyTokenAndCheckRole(['root']), RootController.getAllEmployeeInfo);
-router.get('/employee/search', verifyTokenAndCheckRole(['root']), RootController.searchEmployeeByEmailOrName);
+router.get('/employee/search', verifyTokenAndCheckRole(['root']), RootController.searchEmployeeByEmailOrNameOrPhone);
 router.get('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootController.getEmployeeInfo);
 router.put('/employee/:employeeID', verifyTokenAndCheckRole(['root']), RootController.updateEmployeeInfo);
 router.post('/employee/:employeeID/avatar', verifyTokenAndCheckRole(['root']), upload.single('avatar'), RootController.updateEmployeeAvatar);
