@@ -1,7 +1,7 @@
 'use strict';
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
-require('dotenv').config();
+require('dotenv').config({ path: './../.env' });
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

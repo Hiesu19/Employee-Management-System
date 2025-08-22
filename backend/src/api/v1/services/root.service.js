@@ -63,21 +63,14 @@ const getAllEmployeeInfo = async (page, limit) => {
     return { totalEmployees, employees };
 }
 
-const searchEmployeeByEmailOrName = async (email, name) => {
-    validateEmail(email);
+const searchEmployeeByEmailOrNameOrPhone = async (keyword) => {
+
     const whereConditions = [];
 
-    if (email) {
-        whereConditions.push({ email: { [Op.like]: `%${email}%` } });
-    }
 
-    if (name) {
-        whereConditions.push({ fullName: { [Op.like]: `%${name}%` } });
-    }
-
-    if (whereConditions.length === 0) {
-        throw new ResponseError(400, "Please provide either email or name to search");
-    }
+    whereConditions.push({ email: { [Op.iLike]: `%${keyword}%` } });
+    whereConditions.push({ fullName: { [Op.iLike]: `%${keyword}%` } });
+    whereConditions.push({ phone: { [Op.iLike]: `%${keyword}%` } });
 
     const employees = await User.findAll({
         where: {
@@ -85,9 +78,13 @@ const searchEmployeeByEmailOrName = async (email, name) => {
         },
         attributes: {
             exclude: ['password']
-        }
+        },
+        include: [{
+            model: Department,
+            attributes: ['departmentName', 'departmentID']
+        }]
     });
-    return employees;
+    return { totalEmployees: employees.length, employees };
 }
 
 const updateEmployeeInfo = async (employeeID, fullName, phone) => {
@@ -221,7 +218,7 @@ module.exports = {
     deleteEmployee,
     getEmployeeInfo,
     getAllEmployeeInfo,
-    searchEmployeeByEmailOrName,
+    searchEmployeeByEmailOrNameOrPhone,
     deleteEmployee,
     changeDepartment,
     changeRole,
